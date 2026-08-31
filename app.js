@@ -246,14 +246,10 @@ function parseTeamInfoSettings(csvText) {
 }
 
 async function loadLiveData() {
-	if (!decryptedCsvUrl) return;
 	try {
-		// Use Team Info tab URL for public web portal
-		let targetUrl = decryptedCsvUrl;
-		if (targetUrl.includes('sheet=')) {
-			targetUrl = targetUrl.replace(/sheet=[^&]+/, 'sheet=Team%20Info');
-		}
-		const cacheBustUrl = targetUrl + (targetUrl.includes('?') ? '&' : '?') + '_cb=' + Date.now();
+		// Directly target Public Feed Spreadsheet URL
+		const publicSheetUrl = `https://docs.google.com/spreadsheets/d/1Vd9B6jyrT3HUU8eSx9MHQmpJ7Ui3JR7bdjQQIeHwNAQ/gviz/tq?tqx=out:csv&sheet=Team%20Info`;
+		const cacheBustUrl = publicSheetUrl + '&_cb=' + Date.now();
 		const response = await fetch(cacheBustUrl, { cache: 'no-store' });
 
 		if (!response.ok) {
