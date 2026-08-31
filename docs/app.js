@@ -93,6 +93,7 @@ const scheduleData = [
 	{ date: "Tue 9/29", time: "5:00 PM", category: "Game", title: "@ Watertown", location: "Watertown High School", tagClass: "tag-game" },
 	{ date: "Wed 9/30", time: "Post-Practice", category: "Dinner", title: "Team Dinner #4", location: "Huntoon Concessions", tagClass: "tag-dinner" },
 	{ date: "Thu 10/01", time: "5:00 PM", category: "Game", title: "vs Beaver Dam", location: "Jaycee Community Park Field 1", tagClass: "tag-game" },
+	{ date: "Fri 10/02", time: "TBA", category: "Bonding", title: "Team Bonding Activity (TBA)", location: "TBA", tagClass: "tag-bonding" },
 	{ date: "Mon 10/05", time: "Post-Practice", category: "Dinner", title: "Team Dinner #5", location: "Huntoon Concessions", tagClass: "tag-dinner" },
 	{ date: "Tue 10/06", time: "5:00 PM", category: "Game", title: "@ Waunakee", location: "Waunakee High School", tagClass: "tag-game" },
 	{ date: "Thu 10/08", time: "5:00 PM", category: "Game", title: "vs Edgewood", location: "Jaycee Community Park Field 1", tagClass: "tag-game" },
@@ -445,7 +446,6 @@ function renderSchedule(events, filter = 'ALL') {
 	today.setHours(0, 0, 0, 0);
 
 	const filtered = events.filter(e => {
-		// Category matching logic
 		let categoryMatch = false;
 		const catUpper = (e.category || '').toUpperCase();
 		if (filter === 'ALL') {
@@ -460,7 +460,11 @@ function renderSchedule(events, filter = 'ALL') {
 
 		if (!categoryMatch) return false;
 
-		// Date matching logic (Keep upcoming events or events without date)
+		// For Service & Bonding tab, show ALL category events (so past bonding events like Gasner's dinner & Alumni game remain visible)
+		if (filter === 'SERVICE') {
+			return true;
+		}
+
 		if (e.date) {
 			const parts = e.date.split(' ');
 			const dateStr = parts[1] || e.date; // e.g. "9/1" or "8/29"
