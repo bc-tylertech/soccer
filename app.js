@@ -116,7 +116,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function checkPasscode() {
-	const savedUrl = sessionStorage.getItem('ohs_decrypted_csv_url');
+	let savedUrl = sessionStorage.getItem('ohs_decrypted_csv_url');
+	if (savedUrl && savedUrl.includes('1Cmpw5ENypjUQmuzkmfoYIsimyHQjL8AjI1WxMHVcXnA')) {
+		sessionStorage.removeItem('ohs_decrypted_csv_url');
+		savedUrl = null;
+	}
 	if (savedUrl) {
 		decryptedCsvUrl = savedUrl;
 		const overlay = document.getElementById('passcodeOverlay');
