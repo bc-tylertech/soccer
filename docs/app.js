@@ -1,7 +1,7 @@
-const SPREADSHEET_ID = '1Cmpw5ENypjUQmuzkmfoYIsimyHQjL8AjI1WxMHVcXnA';
+const SPREADSHEET_ID = '1Vd9B6jyrT3HUU8eSx9MHQmpJ7Ui3JR7bdjQQIeHwNAQ';
 
 // Live Google Sheets Public CSV Endpoint URL for the Team Dinners tab
-const LIVE_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=Team%20Dinners`;
+const LIVE_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=Team%20Info`;
 
 // Generic fallback seed data (Zero personal names or emails)
 const fallbackDinners = [
@@ -74,44 +74,39 @@ const fallbackDinners = [
 
 const scheduleData = [
 	{ date: "Thu 8/20", time: "Evening", category: "Bonding", title: "Team Dinner @ Coach Gasner's House", location: "Coach Gasner's House", tagClass: "tag-bonding" },
-	{ date: "Sat 8/22", time: "10:00 AM", category: "Scrimmage", title: "@ Sun Prairie West", location: "Sun Prairie West High School", tagClass: "tag-game" },
-	{ date: "Sat 8/22", time: "11:30 AM", category: "Scrimmage", title: "@ Sun Prairie East", location: "Sun Prairie West High School", tagClass: "tag-game" },
-	{ date: "Tue 8/25", time: "5:00 PM", category: "Service", title: "OHS Alumni Game (Ball Boys)", location: "High School Turf Field", tagClass: "tag-service" },
-	{ date: "Thu 8/27", time: "5:00 PM", category: "Game", title: "vs Middleton", location: "Jaycee Community Park Field", tagClass: "tag-game" },
-	{ date: "Sat 8/29", time: "10:00 AM", category: "Game", title: "vs Madison Memorial", location: "OHS Huntoon Field", tagClass: "tag-game" },
-	{ date: "Tue 9/1", time: "5:30 PM", category: "Game", title: "vs Sun Prairie West", location: "Jaycee Community Park Field", tagClass: "tag-game" },
-	{ date: "Thu 9/3", time: "5:00 PM", category: "Game", title: "@ Sauk Prairie", location: "Sauk Prairie Middle School", tagClass: "tag-game" },
-	{ date: "Sat 9/5", time: "12:00 PM", category: "Game", title: "vs Verona", location: "Jaycee Community Park Field", tagClass: "tag-game" },
-	{ date: "Tue 9/8", time: "5:00 PM", category: "Game", title: "@ Madison West", location: "Cherokee Heights Middle School", tagClass: "tag-game" },
-	{ date: "Wed 9/9", time: "5:45 PM", category: "Service", title: "Bingo with Residents at The Beehive", location: "Beehive Retirement Home", tagClass: "tag-service" },
-	{ date: "Sat 9/12", time: "9:00 AM", category: "Tournament", title: "Waunakee JV2 Boys Soccer Invite", location: "Waunakee High School Warrior Pitch", tagClass: "tag-game" },
-	{ date: "Mon 9/14", time: "Post-Practice", category: "Team Dinner", title: "Team Dinner #2", location: "Huntoon Concessions", tagClass: "tag-dinner" },
-	{ date: "Tue 9/15", time: "5:00 PM", category: "Game", title: "vs Madison East", location: "Jaycee Community Park Field", tagClass: "tag-game" },
-	{ date: "Thu 9/17", time: "5:00 PM", category: "Game", title: "@ Madison Memorial", location: "Ezekiel Gillespie Middle School", tagClass: "tag-game" },
-	{ date: "Sat 9/19", time: "12:00 PM", category: "Game", title: "@ Middleton", location: "Airport Road Soccer Fields", tagClass: "tag-game" },
-	{ date: "Mon 9/21", time: "5:30 PM", category: "Service", title: "Youth Training Session", location: "Soccer Complex", tagClass: "tag-service" },
-	{ date: "Tue 9/22", time: "5:00 PM", category: "Game", title: "vs Waunakee", location: "OHS Ice Rink Field", tagClass: "tag-game" },
-	{ date: "Thu 9/24", time: "5:00 PM", category: "Game", title: "vs Monona Grove", location: "Jaycee Community Park Field", tagClass: "tag-game" },
-	{ date: "Mon 9/28", time: "Post-Practice", category: "Team Dinner", title: "Team Dinner #4", location: "Huntoon Concessions", tagClass: "tag-dinner" },
-	{ date: "Tue 9/29", time: "5:00 PM", category: "Game", title: "@ DeForest Area", location: "DeForest High School Cleveland Field", tagClass: "tag-game" },
-	{ date: "Wed 9/30", time: "Post-Practice", category: "Team Dinner", title: "Team Dinner #5", location: "Huntoon Concessions", tagClass: "tag-dinner" },
-	{ date: "Thu 10/1", time: "5:00 PM", category: "Game", title: "@ Madison East", location: "Demetral Park", tagClass: "tag-game" },
-	{ date: "Fri 10/2", time: "TBA", category: "Bonding", title: "Team Bonding Activity (TBD)", location: "TBA", tagClass: "tag-bonding" },
-	{ date: "Mon 10/5", time: "Post-Practice", category: "Team Dinner", title: "Team Dinner #6", location: "Huntoon Concessions", tagClass: "tag-dinner" },
-	{ date: "Tue 10/6", time: "5:00 PM", category: "Game", title: "vs Madison West", location: "OHS Huntoon Field", tagClass: "tag-game" },
-	{ date: "Sat 10/10", time: "11:00 AM", category: "Game", title: "@ Sun Prairie West", location: "Sun Prairie West High School", tagClass: "tag-game" },
-	{ date: "Mon 10/12", time: "Post-Practice", category: "Team Dinner", title: "Team Dinner #7", location: "Huntoon Concessions", tagClass: "tag-dinner" },
-	{ date: "Tue 10/13", time: "4:30 PM", category: "Game", title: "vs Sauk Prairie (Season Finale)", location: "Jaycee Community Park Field", tagClass: "tag-game" },
+	{ date: "Sat 8/22", time: "10:00 AM", category: "Scrimmage", title: "vs Sun Prairie West", location: "Sun Prairie West High School", tagClass: "tag-game" },
+	{ date: "Sat 8/22", time: "11:30 AM", category: "Scrimmage", title: "vs Sun Prairie East", location: "Sun Prairie West High School", tagClass: "tag-game" },
+	{ date: "Tue 8/25", time: "5:00 PM", category: "Service", title: "OHS Alumni Game - Ball Boys for JV Game", location: "High School Turf Field", tagClass: "tag-bonding" },
+	{ date: "Wed 8/26", time: "Post-Practice", category: "Dinner", title: "Team Dinner #1 (Past)", location: "Huntoon Concessions", tagClass: "tag-dinner" },
+	{ date: "Thu 8/27", time: "5:00 PM", category: "Game", title: "vs Middleton", location: "Jaycee Community Park Field 1", tagClass: "tag-game" },
+	{ date: "Sat 8/29", time: "10:00 AM", category: "Game", title: "vs Madison Memorial", location: "Oregon High School Huntoon Field", tagClass: "tag-game" },
+	{ date: "Tue 9/01", time: "5:30 PM", category: "Game", title: "vs Sun Prairie West", location: "Jaycee Community Park Field 1", tagClass: "tag-game" },
+	{ date: "Thu 9/03", time: "5:00 PM", category: "Game", title: "@ Sauk Prairie", location: "Sauk Prairie Middle School Practice 1", tagClass: "tag-game" },
+	{ date: "Tue 9/08", time: "5:00 PM", category: "Game", title: "vs Stoughton", location: "Jaycee Community Park Field 1", tagClass: "tag-game" },
+	{ date: "Sat 9/12", time: "9:00 AM", category: "Game", title: "@ Waunakee Invitational", location: "Waunakee High School", tagClass: "tag-game" },
+	{ date: "Mon 9/14", time: "Post-Practice", category: "Dinner", title: "Team Dinner #2", location: "Huntoon Concessions", tagClass: "tag-dinner" },
+	{ date: "Tue 9/15", time: "5:00 PM", category: "Game", title: "vs Monona Grove", location: "Jaycee Community Park Field 1", tagClass: "tag-game" },
+	{ date: "Thu 9/17", time: "5:00 PM", category: "@ Fort Atkinson", title: "@ Fort Atkinson", location: "Fort Atkinson High School", tagClass: "tag-game" },
+	{ date: "Tue 9/22", time: "5:00 PM", category: "Game", title: "@ Milton", location: "Milton High School", tagClass: "tag-game" },
+	{ date: "Thu 9/24", time: "5:00 PM", category: "Game", title: "vs Mount Horeb", location: "Jaycee Community Park Field 1", tagClass: "tag-game" },
+	{ date: "Mon 9/28", time: "Post-Practice", category: "Dinner", title: "Team Dinner #3", location: "Huntoon Concessions", tagClass: "tag-dinner" },
+	{ date: "Tue 9/29", time: "5:00 PM", category: "Game", title: "@ Watertown", location: "Watertown High School", tagClass: "tag-game" },
+	{ date: "Wed 9/30", time: "Post-Practice", category: "Dinner", title: "Team Dinner #4", location: "Huntoon Concessions", tagClass: "tag-dinner" },
+	{ date: "Thu 10/01", time: "5:00 PM", category: "Game", title: "vs Beaver Dam", location: "Jaycee Community Park Field 1", tagClass: "tag-game" },
+	{ date: "Mon 10/05", time: "Post-Practice", category: "Dinner", title: "Team Dinner #5", location: "Huntoon Concessions", tagClass: "tag-dinner" },
+	{ date: "Tue 10/06", time: "5:00 PM", category: "Game", title: "@ Waunakee", location: "Waunakee High School", tagClass: "tag-game" },
+	{ date: "Thu 10/08", time: "5:00 PM", category: "Game", title: "vs Edgewood", location: "Jaycee Community Park Field 1", tagClass: "tag-game" },
+	{ date: "Mon 10/12", time: "Post-Practice", category: "Dinner", title: "Team Dinner #6", location: "Huntoon Concessions", tagClass: "tag-dinner" },
 	{ date: "Thu 10/15", time: "6:00 PM", category: "Banquet", title: "End of Season Team Banquet", location: "OHS Cafeteria", tagClass: "tag-bonding" }
 ];
 
 // Encrypted Google Sheet CSV URL Payload (AES-256-GCM + PBKDF2 100k iterations)
 // The raw CSV URL and password "Panthers2026" are NEVER stored anywhere in source code!
 const ENCRYPTED_CSV_PAYLOAD = {
-	salt: "J4vhhA6N914GmNF/QKt0GQ==",
-	iv: "XUMY0CKUlek0lqHr",
-	ciphertext: "AKGtLdMZhG7q7ul7zQcPJ/CgssMZJOXWD7cCyUvVQJYTIAxS5DdY16RNuOklIbbWvgqiR0kywgYY50ea/63c/jV+ExL4OCBP1BMqJpieAdTp2pXKGoLVy+vfS8hUU9GKxqFq2AD6/XU8ryh7zlkNgrl9RNvDqMslPUtpVQ==",
-	tag: "8DMl/0h0g2Sx6Oo/Mo2SlA=="
+	salt: "yu0Pob7cySMrcokQ4keyjA==",
+	iv: "WFcJXlPsaiz4gI9D",
+	ciphertext: "Wn+NzCXv/gI4aGNdKS949NNL1Lo4xsoqABq07Tignt4ARCzUIBpKDy0DS4DdM3QGhnrI07JACRL9QNB8MYu/obk3JSYASsR6Q8fC7V7aRLpKPmK5gdqg7S6anl083EuqCFdbc+B+PBf2YxxuFxT4RvUjYSoCT0tq7A==",
+	tag: "QNXBEsMNEZd8aqusF41Khg=="
 };
 
 let decryptedCsvUrl = null;
