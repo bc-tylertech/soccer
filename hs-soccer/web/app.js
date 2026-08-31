@@ -301,6 +301,23 @@ function parseCSVLine(text) {
 	return result;
 }
 
+function formatDinnerDate(dateStr) {
+	if (!dateStr) return dateStr;
+	if (dateStr.includes(',')) return dateStr;
+	const parts = dateStr.split('-');
+	if (parts.length === 3) {
+		const year = parseInt(parts[0]);
+		const month = parseInt(parts[1]) - 1;
+		const day = parseInt(parts[2]);
+		const d = new Date(year, month, day);
+		const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+		const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+		const suffix = (day === 1 || day === 21 || day === 31) ? 'st' : (day === 2 || day === 22) ? 'nd' : (day === 3 || day === 23) ? 'rd' : 'th';
+		return `${days[d.getDay()]}, ${months[d.getMonth()]} ${day}${suffix}`;
+	}
+	return dateStr;
+}
+
 function parseCSVToDinners(csvText) {
 	const lines = csvText.split('\n').filter(l => l.trim().length > 0);
 	if (lines.length <= 1) return [];
@@ -309,22 +326,34 @@ function parseCSVToDinners(csvText) {
 	for (let i = 0; i < lines.length; i++) {
 		const cols = parseCSVLine(lines[i]);
 		if (cols.length >= 7) {
-			const date = cols[0];
-			if (!date || date.includes('Setting') || date.includes('---') || date.includes('Dinner Date') || isDinnerDatePast(date)) continue; // Skip past dinner dates!
+			const dateStr = cols[0];
+			if (!dateStr || dateStr.includes('Setting') || dateStr.includes('---') || dateStr.includes('Dinner Date') || isDinnerDatePast(dateStr)) continue;
 
+			const formattedDate = formatDinnerDate(dateStr);
 			const host = cols[1] || 'Huntoon Concessions';
 			const loc = cols[2] || 'Huntoon Concessions';
 			const main = cols[3] || 'Unassigned';
 			const drinks = cols[4] || 'Unassigned';
 			const dessert = cols[5] || 'Unassigned';
 			const sides = cols[6] || 'Unassigned';
-			const count = parseInt(cols[7] || '0') || 0;
-			const status = cols[8] || 'Needs Volunteers (4 Needed)';
+
+			let count = 0;
+			if (main && main !== 'Unassigned') count++;
+			if (drinks && drinks !== 'Unassigned') count++;
+			if (dessert && dessert !== 'Unassigned') count++;
+			if (sides && sides !== 'Unassigned') count++;
+
+			const needed = Math.max(0, 4 - count);
+			let status = cols[8] || (count >= 4 ? 'FULL (4 Volunteers)' : (count >= 3 ? `Confirmed (${count}/4 Volunteers)` : `Needs Volunteers (${needed} Needed)`));
+			if (status.includes('#REF!')) {
+				status = count >= 4 ? 'FULL (4 Volunteers)' : (count >= 3 ? `Confirmed (${count}/4 Volunteers)` : `Needs Volunteers (${needed} Needed)`);
+			}
+
 			const statusClass = status.includes('FULL') ? 'status-full' : (status.includes('Confirmed') ? 'status-confirmed' : 'status-needs');
 			const fillClass = status.includes('FULL') ? 'fill-full' : (status.includes('Confirmed') ? 'fill-confirmed' : 'fill-needs');
 
 			dinners.push({
-				date: date,
+				date: formattedDate,
 				location: loc,
 				count: count,
 				max: 4,
