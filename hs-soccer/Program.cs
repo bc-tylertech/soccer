@@ -165,7 +165,7 @@ namespace HsSoccer
 						break;
 
 					case "crypto-gen":
-						var csvUrl = "https://docs.google.com/spreadsheets/d/1Cmpw5ENypjUQmuzkmfoYIsimyHQjL8AjI1WxMHVcXnA/gviz/tq?tqx=out:csv&sheet=Team%20Dinners";
+						var csvUrl = "https://docs.google.com/spreadsheets/d/1Vd9B6jyrT3HUU8eSx9MHQmpJ7Ui3JR7bdjQQIeHwNAQ/gviz/tq?tqx=out:csv&sheet=Team%20Info";
 						var passcode = "Panthers2026";
 						using ( var pbkdf2 = new System.Security.Cryptography.Rfc2898DeriveBytes( passcode, 16, 100000, System.Security.Cryptography.HashAlgorithmName.SHA256 ) )
 						{
@@ -195,15 +195,32 @@ namespace HsSoccer
 					case "update-dinner-formulas":
 					case "sync-dinner-form":
 						var sheetIdToUse = string.IsNullOrWhiteSpace( targetSheetId ) ? "1Cmpw5ENypjUQmuzkmfoYIsimyHQjL8AjI1WxMHVcXnA" : targetSheetId;
+						var publicSheetIdToUse = "1Vd9B6jyrT3HUU8eSx9MHQmpJ7Ui3JR7bdjQQIeHwNAQ";
 						var sheetsDinnerSync = new GoogleSheetsService();
 						await sheetsDinnerSync.InitializeAsync();
 
-						Console.WriteLine( "Updating 'Team Dinners' and 'Team Info' tracking tab formulas..." );
+						Console.WriteLine( "Updating Private Master Sheet ('Team Dinners' and 'Team Info')..." );
 						var defaultDinners = rosterManager.GenerateDefaultDinnerSlots();
 						await sheetsDinnerSync.SeedDinnersAsync( sheetIdToUse, defaultDinners );
 						await sheetsDinnerSync.SeedTeamInfoTabAsync( sheetIdToUse, defaultDinners );
 
-						Console.WriteLine( "SUCCESS: 'Team Dinners' and 'Team Info' tracking tab formulas updated!" );
+						Console.WriteLine( "Syncing computed public data to Public Sheet Feed ('" + publicSheetIdToUse + "')..." );
+						await sheetsDinnerSync.SyncPublicSheetFromMasterAsync( sheetIdToUse, publicSheetIdToUse );
+
+						Console.WriteLine( "SUCCESS: Both Private Master Sheet and Public Sheet Feed updated!" );
+						break;
+
+					case "create-public-sheet":
+						var masterId = string.IsNullOrWhiteSpace( targetSheetId ) ? "1Cmpw5ENypjUQmuzkmfoYIsimyHQjL8AjI1WxMHVcXnA" : targetSheetId;
+						var sheetsSvcPublic = new GoogleSheetsService();
+						await sheetsSvcPublic.InitializeAsync();
+						var dinnersList = rosterManager.GenerateDefaultDinnerSlots();
+						var pubId = await sheetsSvcPublic.CreatePublicFeedSpreadsheetAsync( masterId, dinnersList );
+						Console.WriteLine( "=========================================================================" );
+						Console.WriteLine( "NEW PUBLIC SPREADSHEET FILE CREATED & SET TO PUBLIC VIEW:" );
+						Console.WriteLine( "Public Spreadsheet ID: " + pubId );
+						Console.WriteLine( "Public CSV Feed URL:   https://docs.google.com/spreadsheets/d/" + pubId + "/gviz/tq?tqx=out:csv&sheet=Team%20Info" );
+						Console.WriteLine( "=========================================================================" );
 						break;
 
 					case "sync-dues-dropdown":
