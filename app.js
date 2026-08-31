@@ -318,6 +318,15 @@ function formatDinnerDate(dateStr) {
 	return dateStr;
 }
 
+function isActualDinnerDate(dateStr) {
+	if (!dateStr) return false;
+	const clean = dateStr.trim();
+	if (/^\d{4}-\d{2}-\d{2}/.test(clean)) return true;
+	const months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+	const lower = clean.toLowerCase();
+	return months.some(m => lower.includes(m));
+}
+
 function parseCSVToDinners(csvText) {
 	const lines = csvText.split('\n').filter(l => l.trim().length > 0);
 	if (lines.length <= 1) return [];
@@ -327,7 +336,7 @@ function parseCSVToDinners(csvText) {
 		const cols = parseCSVLine(lines[i]);
 		if (cols.length >= 7) {
 			const dateStr = cols[0];
-			if (!dateStr || dateStr.includes('Setting') || dateStr.includes('---') || dateStr.includes('Dinner Date') || isDinnerDatePast(dateStr)) continue;
+			if (!isActualDinnerDate(dateStr) || isDinnerDatePast(dateStr)) continue;
 
 			const formattedDate = formatDinnerDate(dateStr);
 			const host = cols[1] || 'Huntoon Concessions';
