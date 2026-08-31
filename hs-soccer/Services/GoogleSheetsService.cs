@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Google.Apis.Auth.OAuth2;
+using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
@@ -37,7 +38,8 @@ namespace HsSoccer.Services
 			var scopes = new[]
 			{
 				SheetsService.Scope.Spreadsheets,
-				SheetsService.Scope.DriveFile
+				SheetsService.Scope.DriveFile,
+				"https://www.googleapis.com/auth/drive"
 			};
 
 			using ( var stream = new FileStream( credFile, FileMode.Open, FileAccess.Read ) )
@@ -689,6 +691,37 @@ namespace HsSoccer.Services
 				dinnerSlots = rm.GenerateDefaultDinnerSlots();
 			}
 
+			// Ensure tab named 'Team Info' exists
+			try
+			{
+				var spreadsheetMeta = await _service.Spreadsheets.Get( spreadsheetId ).ExecuteAsync();
+				var hasTeamInfo = spreadsheetMeta.Sheets.Any( s => s.Properties.Title == "Team Info" );
+				if ( !hasTeamInfo && spreadsheetMeta.Sheets.Count > 0 )
+				{
+					var firstSheetId = spreadsheetMeta.Sheets[0].Properties.SheetId;
+					var renameReq = new BatchUpdateSpreadsheetRequest
+					{
+						Requests = new List<Request>
+						{
+							new Request
+							{
+								UpdateSheetProperties = new UpdateSheetPropertiesRequest
+								{
+									Properties = new SheetProperties
+									{
+										SheetId = firstSheetId,
+										Title = "Team Info"
+									},
+									Fields = "title"
+								}
+							}
+						}
+					};
+					await _service.Spreadsheets.BatchUpdate( renameReq, spreadsheetId ).ExecuteAsync();
+				}
+			}
+			catch { }
+
 			var range = "'Team Info'!A1:I30";
 			var valueRange = new ValueRange
 			{
@@ -732,6 +765,104 @@ namespace HsSoccer.Services
 			updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
 			await updateRequest.ExecuteAsync();
 			Console.WriteLine( "SUCCESS: Seeded 'Team Info' tab with Dues info & bare-minimum Public Team Dinner Status table!" );
+		}
+
+		public async Task<string> CreatePublicFeedSpreadsheetAsync( string masterSpreadsheetId, List<TeamDinnerSlot> dinnerSlots )
+		{
+			if ( _service == null )
+			{
+				await InitializeAsync();
+			}
+
+			Console.WriteLine( "Creating brand-new separate Public Spreadsheet File in shared Drive folder..." );
+
+			using var stream = new FileStream( _credentialsPath, FileMode.Open, FileAccess.Read );
+			var googleCred = GoogleCredential.FromStream( stream ).CreateScoped( new[] { DriveService.Scope.Drive } );
+			var driveSvc = new DriveService( new BaseClientService.Initializer()
+			{
+				HttpClientInitializer = googleCred,
+				ApplicationName = "High School Soccer Volunteer System"
+			} );
+
+			var fileMetadata = new Google.Apis.Drive.v3.Data.File
+			{
+				Name = "Oregon JV2 Soccer - Public Portal Feed",
+				MimeType = "application/vnd.google-apps.spreadsheet",
+				Parents = new List<string> { "1q7vy8NL92cbpIQOI-7BmI0DuLISrX0Yp" }
+			};
+
+			var createReq = driveSvc.Files.Create( fileMetadata );
+			createReq.SupportsAllDrives = true;
+			createReq.Fields = "id";
+			var createdFile = await createReq.ExecuteAsync();
+			var publicSheetId = createdFile.Id;
+			Console.WriteLine( "SUCCESS: Created Public Sheet File (ID: " + publicSheetId + ")" );
+
+			// Make the new spreadsheet file PUBLIC (Anyone with link can read) via Drive API
+			var perm = new Google.Apis.Drive.v3.Data.Permission
+			{
+				Type = "anyone",
+				Role = "reader"
+			};
+			var permReq = driveSvc.Permissions.Create( perm, publicSheetId );
+			permReq.SupportsAllDrives = true;
+			await permReq.ExecuteAsync();
+			Console.WriteLine( "SUCCESS: Set Drive Permissions on Public Sheet: Anyone with link can view (reader)!" );
+
+			return publicSheetId;
+		}
+
+		public async Task SyncPublicSheetFromMasterAsync( string masterSpreadsheetId, string publicSpreadsheetId )
+		{
+			if ( _service == null )
+			{
+				await InitializeAsync();
+			}
+
+			Console.WriteLine( "Reading computed public summary from Master Sheet 'Team Info' tab..." );
+			var getReq = _service.Spreadsheets.Values.Get( masterSpreadsheetId, "'Team Info'!A1:I30" );
+			var masterData = await getReq.ExecuteAsync();
+
+			if ( masterData.Values != null && masterData.Values.Count > 0 )
+			{
+				// Ensure tab named 'Team Info' exists on Public Sheet
+				try
+				{
+					var spreadsheetMeta = await _service.Spreadsheets.Get( publicSpreadsheetId ).ExecuteAsync();
+					var hasTeamInfo = spreadsheetMeta.Sheets.Any( s => s.Properties.Title == "Team Info" );
+					if ( !hasTeamInfo && spreadsheetMeta.Sheets.Count > 0 )
+					{
+						var firstSheetId = spreadsheetMeta.Sheets[0].Properties.SheetId;
+						var renameReq = new BatchUpdateSpreadsheetRequest
+						{
+							Requests = new List<Request>
+							{
+								new Request
+								{
+									UpdateSheetProperties = new UpdateSheetPropertiesRequest
+									{
+										Properties = new SheetProperties
+										{
+											SheetId = firstSheetId,
+											Title = "Team Info"
+										},
+										Fields = "title"
+									}
+								}
+							}
+						};
+						await _service.Spreadsheets.BatchUpdate( renameReq, publicSpreadsheetId ).ExecuteAsync();
+					}
+				}
+				catch { }
+
+				var range = "'Team Info'!A1:I" + masterData.Values.Count;
+				var valueRange = new ValueRange { Values = masterData.Values };
+				var updateRequest = _service.Spreadsheets.Values.Update( valueRange, publicSpreadsheetId, range );
+				updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+				await updateRequest.ExecuteAsync();
+				Console.WriteLine( "SUCCESS: Synced " + masterData.Values.Count + " rows of computed public data from Master Sheet to Public Sheet Feed!" );
+			}
 		}
 	}
 }
