@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="robots" content="noindex, nofollow">
+	<title>Oregon JV2 Boys Soccer | Team Portal & Volunteer Hub</title>
+	<link rel="stylesheet" href="styles.css">
+	<style>
+		/* Passcode Modal Overlay Styles */
+		#passcodeOverlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100vw;
+			height: 100vh;
+			background: rgba(15, 23, 42, 0.96);
+			backdrop-filter: blur(12px);
+			z-index: 99999;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 1.5rem;
+		}
+		.passcode-card {
+			background: #1e293b;
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			border-radius: 1.25rem;
+			padding: 2.5rem;
+			max-width: 420px;
+			width: 100%;
+			text-align: center;
+			box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+		}
+		.passcode-input {
+			width: 100%;
+			padding: 0.9rem 1.2rem;
+			font-size: 1.1rem;
+			background: #0f172a;
+			border: 1px solid #334155;
+			border-radius: 0.75rem;
+			color: #f8fafc;
+			margin: 1.2rem 0;
+			text-align: center;
+			letter-spacing: 2px;
+			outline: none;
+		}
+		.passcode-input:focus {
+			border-color: #3b82f6;
+			box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+		}
+		.passcode-error {
+			color: #ef4444;
+			font-size: 0.9rem;
+			margin-top: 0.5rem;
+			display: none;
+		}
+	</style>
+</head>
+<body>
+
+	<!-- Passcode Protection Modal Overlay -->
+	<div id="passcodeOverlay">
+		<div class="passcode-card">
+			<div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔒</div>
+			<h2 style="color: #f8fafc; font-size: 1.5rem; margin-bottom: 0.5rem;">Private Parent Portal</h2>
+			<p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.5;">Please enter the team passcode to view dinner sign-ups and match schedules.</p>
+			
+			<form id="passcodeForm" onsubmit="event.preventDefault(); unlockPortal();">
+				<input type="password" id="passcodeInput" class="passcode-input" placeholder="Enter Team Passcode" autofocus autocomplete="current-password" />
+				<button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem;">Unlock Portal</button>
+				<div id="passcodeError" class="passcode-error">Incorrect passcode. Please try again.</div>
+			</form>
+		</div>
+	</div>
+
+	<div class="container" id="mainContainer" style="display: none;">
+		
+		<!-- Header Banner -->
+		<header style="padding: 1.25rem 1.5rem; margin-bottom: 1.75rem;">
+			<div class="team-badge" style="margin-bottom: 0.35rem; font-size: 0.75rem; padding: 0.25rem 0.75rem;">Oregon Panthers • 2026 Season</div>
+			<h1 style="font-size: 1.75rem; margin-bottom: 0.2rem;">Oregon JV2 Boys Soccer</h1>
+			<p class="subtitle" style="font-size: 0.9rem; margin-bottom: 0;">Parent Volunteer Portal, Team Dinners & Match Schedule</p>
+		</header>
+
+		<!-- Team Dues & How to Pay Section -->
+		<section style="margin-bottom: 3.5rem;">
+			<h2 class="section-title">
+				<span>💳</span> Team Dues & Payment Information
+			</h2>
+			<div class="event-card" style="background: #1e293b; padding: 1.75rem; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.08);">
+				<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+					<div>
+						<h3 style="font-size: 1.3rem; color: #f8fafc; margin-bottom: 0.25rem;">Fall Season Team Dues: <span style="color: #3b82f6;">$75.00</span> per player</h3>
+						<p style="color: #94a3b8; font-size: 0.95rem;">Payment Due Date: <strong style="color: #f8fafc;">Wednesday, September 2nd</strong></p>
+					</div>
+					<div class="status-badge status-confirmed" style="font-size: 0.9rem; padding: 0.4rem 1rem;">
+						Co-Manager: Megan Rueth
+					</div>
+				</div>
+
+				<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-top: 1rem;">
+					<div style="background: #0f172a; padding: 1.25rem; border-radius: 0.75rem; border: 1px solid rgba(59,130,246,0.2);">
+						<div style="font-size: 1.1rem; font-weight: 600; color: #60a5fa; margin-bottom: 0.5rem;">💙 Venmo (Preferred)</div>
+						<div style="font-size: 1.2rem; font-weight: 700; color: #f8fafc; letter-spacing: 0.5px;" id="venmoHandle">See Team Info Sheet</div>
+						<div style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.3rem;">Phone Last 4 Digits: <strong id="venmoPhone">••••</strong></div>
+					</div>
+
+					<div style="background: #0f172a; padding: 1.25rem; border-radius: 0.75rem; border: 1px solid rgba(59,130,246,0.2);">
+						<div style="font-size: 1.1rem; font-weight: 600; color: #60a5fa; margin-bottom: 0.5rem;">💙 PayPal</div>
+						<div style="font-size: 1.2rem; font-weight: 700; color: #f8fafc; letter-spacing: 0.5px;" id="paypalHandle">See Team Info Sheet</div>
+						<div style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.3rem;">Phone Last 4 Digits: <strong id="paypalPhone">••••</strong></div>
+					</div>
+				</div>
+
+				<div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.9rem; color: #cbd5e1;">
+					<p style="margin-bottom: 0.5rem;">📝 <strong>Important Memo Note:</strong> Please include your player's name in the Venmo / PayPal note or memo line of a check.</p>
+					<p style="margin-bottom: 0.5rem;">💵 <strong>Cash or Check:</strong> Personal check or cash is accepted at Tuesday's game. Please message Megan to let her know.</p>
+					<p style="color: #94a3b8; font-size: 0.85rem;">🤝 <strong>Scholarship Funds:</strong> If this fee presents a financial hardship, scholarship funds are available. Please contact Megan or Brian privately.</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- Team Dinners Section -->
+		<section style="margin-bottom: 3.5rem;">
+			<h2 class="section-title">
+				<span>🥗</span> Team Dinner Sign-Ups & Volunteer Status
+			</h2>
+			<p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+				Post-practice dinners at Huntoon Concessions. Maximum 4 parents per dinner date. Dates fill automatically once 4 slots are reached!
+			</p>
+			
+			<div class="dinner-grid" id="dinnerGrid">
+				<!-- Dynamically rendered by app.js -->
+			</div>
+		</section>
+
+		<!-- Schedule & Event Calendar Section -->
+		<section>
+			<h2 class="section-title">
+				<span>📅</span> Official Match & Event Schedule
+			</h2>
+			<p style="color: var(--text-secondary); margin-bottom: 1rem;">
+				Schedule subject to weather or field location changes. For real-time athletic association listings and weather updates, refer to the official GoBound site.
+			</p>
+			<div style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
+				<a href="https://gobound.com/wi/wiaa/bsc/2026-27/oregon/jv2" target="_blank" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; padding: 0.6rem 1.25rem; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); color: #60a5fa;">
+					<span>🔗</span> View Live Oregon JV2 GoBound Schedule ↗
+				</a>
+				<a href="https://gobound.com/wi/schools/oregon/calendar" target="_blank" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; padding: 0.6rem 1.25rem; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #34d399;">
+					<span>📡</span> GoBound Calendar Feed Generator ↗
+				</a>
+			</div>
+
+			<!-- Expandable Calendar Sync Instructions -->
+			<details style="margin-bottom: 1.5rem; background: #1e293b; border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 1rem 1.25rem;">
+				<summary style="cursor: pointer; font-size: 0.95rem; font-weight: 600; color: #60a5fa; outline: none; display: flex; align-items: center; gap: 0.5rem;">
+					<span>📱</span> How to Generate Your Live Calendar Feed in GoBound (Click to Expand)
+				</summary>
+				<div style="margin-top: 1rem; font-size: 0.9rem; color: #cbd5e1; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.85rem;">
+					<ol style="padding-left: 1.25rem; margin: 0;">
+						<li style="margin-bottom: 0.5rem;">Open the <strong><a href="https://gobound.com/wi/schools/oregon/calendar" target="_blank" style="color: #60a5fa; text-decoration: underline;">Oregon High School GoBound Calendar Hub ↗</a></strong>.</li>
+						<li style="margin-bottom: 0.5rem;">Click the square <strong>RSS Feed Icon (📡)</strong> at the top-right of the calendar grid.</li>
+						<li style="margin-bottom: 0.5rem;">In the popup modal, check <strong>Boys Soccer</strong> (and any other Oregon sports you follow).</li>
+						<li style="margin-bottom: 0.5rem;">Scroll down and click the green <strong>"Generate Calendar Links"</strong> button.</li>
+						<li>Click <strong>"Subscribe with Apple"</strong>, <strong>"Subscribe with Google"</strong>, or <strong>"Copy Calendar Link"</strong> to sync live match updates directly to your phone calendar!</li>
+					</ol>
+				</div>
+			</details>
+
+			<div class="section-tabs">
+				<button class="tab-btn active" data-filter="ALL">All Events</button>
+				<button class="tab-btn" data-filter="GAME">Games & Scrimmages</button>
+				<button class="tab-btn" data-filter="DINNER">Team Dinners</button>
+				<button class="tab-btn" data-filter="SERVICE">Service & Bonding</button>
+			</div>
+
+			<div class="schedule-grid" id="scheduleGrid">
+				<!-- Dynamically rendered by app.js -->
+			</div>
+		</section>
+
+		<footer>
+			<p>© 2026 Oregon High School JV2 Boys Soccer • Parent Volunteer Committee</p>
+			<p style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--text-muted);">
+				Managed by Parent Volunteers & Co-Coordinators
+			</p>
+		</footer>
+
+	</div>
+
+	<script src="app.js"></script>
+</body>
+</html>

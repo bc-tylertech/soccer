@@ -1,0 +1,12 @@
+# Security: Exclude Google API private keys & GitHub PAT tokens
+credentials.json
+credentials-oauth.json
+github-pat.txt
+.credentials/
+*.key
+
+# .NET Build output & IDE settings
+bin/
+obj/
+.vs/
+*.user
