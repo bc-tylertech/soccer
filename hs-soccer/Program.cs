@@ -223,6 +223,16 @@ namespace HsSoccer
 						Console.WriteLine( "=========================================================================" );
 						break;
 
+					case "test":
+					case "run-tests":
+						var testRunner = new TestRunner();
+						var testSuccess = await testRunner.RunAllTestsAsync();
+						if ( !testSuccess )
+						{
+							Environment.Exit( 1 );
+						}
+						break;
+
 					case "sync-dues-dropdown":
 						Console.WriteLine( "Reading live roster from Google Sheet..." );
 						var allRosterPlayers = rosterManager.LoadRosterSeed();
