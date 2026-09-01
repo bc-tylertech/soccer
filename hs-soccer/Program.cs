@@ -199,10 +199,12 @@ namespace HsSoccer
 						var sheetsDinnerSync = new GoogleSheetsService();
 						await sheetsDinnerSync.InitializeAsync();
 
-						Console.WriteLine( "Updating Private Master Sheet ('Team Dinners' and 'Team Info')..." );
+						Console.WriteLine( "Updating Private Master Sheet ('Team Dinners', 'Team Info', Dashboard, and Reimbursements)..." );
 						var defaultDinners = rosterManager.GenerateDefaultDinnerSlots();
 						await sheetsDinnerSync.SeedDinnersAsync( sheetIdToUse, defaultDinners );
 						await sheetsDinnerSync.SeedTeamInfoTabAsync( sheetIdToUse, defaultDinners );
+						await sheetsDinnerSync.SeedDashboardTabAsync( sheetIdToUse );
+						await sheetsDinnerSync.SeedReimbursementsAsync( sheetIdToUse );
 
 						Console.WriteLine( "Syncing computed public data to Public Sheet Feed ('" + publicSheetIdToUse + "')..." );
 						await sheetsDinnerSync.SyncPublicSheetFromMasterAsync( sheetIdToUse, publicSheetIdToUse );
@@ -253,7 +255,46 @@ namespace HsSoccer
 					case "inspect-tabs":
 						var sheetsSvcInspect = new GoogleSheetsService();
 						await sheetsSvcInspect.InitializeAsync();
-						await sheetsSvcInspect.InspectAllTabsAsync( targetSheetId ?? "1Cmpw5ENypjUQmuzkmfoYIsimyHQjL8AjI1WxMHVcXnA" );
+						await sheetsSvcInspect.InspectAllTabsAsync( string.IsNullOrWhiteSpace( targetSheetId ) ? "1Cmpw5ENypjUQmuzkmfoYIsimyHQjL8AjI1WxMHVcXnA" : targetSheetId );
+						break;
+
+					case "print-emails":
+					case "emails":
+						var playersForEmail = rosterManager.LoadRosterSeed();
+						Console.WriteLine( "============================================================" );
+						Console.WriteLine( "    OREGON JV2 SOCCER PARENT & PLAYER MAILING LISTS         " );
+						Console.WriteLine( "============================================================" );
+						Console.WriteLine();
+
+						var allParentEmails = playersForEmail
+							.SelectMany( p => p.ParentEmails )
+							.Where( e => !string.IsNullOrWhiteSpace( e ) )
+							.Select( e => e.Trim() )
+							.Distinct( StringComparer.OrdinalIgnoreCase )
+							.ToList();
+
+						var allPlayerEmails = playersForEmail
+							.Select( p => p.PlayerEmail )
+							.Where( e => !string.IsNullOrWhiteSpace( e ) )
+							.Select( e => e.Trim() )
+							.Distinct( StringComparer.OrdinalIgnoreCase )
+							.ToList();
+
+						var combinedUnique = allParentEmails.Concat( allPlayerEmails )
+							.Distinct( StringComparer.OrdinalIgnoreCase )
+							.ToList();
+
+						Console.WriteLine( "=== 📧 PARENT EMAILS ONLY (" + allParentEmails.Count + " unique emails) ===" );
+						Console.WriteLine( string.Join( ", ", allParentEmails ) );
+						Console.WriteLine();
+
+						Console.WriteLine( "=== ⚽ PLAYER EMAILS ONLY (" + allPlayerEmails.Count + " unique emails) ===" );
+						Console.WriteLine( string.Join( ", ", allPlayerEmails ) );
+						Console.WriteLine();
+
+						Console.WriteLine( "=== 👥 COMBINED PARENT & PLAYER MAILING LIST (" + combinedUnique.Count + " total emails) ===" );
+						Console.WriteLine( string.Join( ", ", combinedUnique ) );
+						Console.WriteLine();
 						break;
 
 					case "check-dues":
