@@ -377,8 +377,8 @@ namespace HsSoccer.Services
 					new List<object> { "🥗 Team Dinner Sign-Up Form", "https://docs.google.com/forms/d/1Ol68WmioL42GO_n47N6Cq3g30o_meeqYk9Hjn2SqPD8/viewform", "All Parents", "Form for parents to sign up for dinner dates (Min 3 / Max 5 per date)" },
 					new List<object> { "💳 Expense Reimbursement Form", "https://docs.google.com/forms/d/1a38G6PpgwZrqMzIUNCVxXQwvLsdP-va-jLdnUzxE91o/viewform", "Co-Managers & Volunteers", "Form to submit Gatorade, gift card & sub receipts" },
 					new List<object> { "💵 $75 Dues Collection Form", "https://docs.google.com/forms/d/1RnY-KJ-r29IKLJN_rtXYahsWdu6TNepmpINRRY4No18/viewform", "Co-Managers Only", "Form for Brian & Megan to record $75 fee receipts" },
-					new List<object> { "🌐 Public Parent Web Portal", "https://bc-tylertech.github.io/soccer/hs-soccer/web/", "All Parents", "Live dark-mode website showing dinner status & game schedule" },
-					new List<object> { "📅 Official GoBound Match Schedule", "https://www.boundstate.com/wi/schools/oregon/boys-soccer/2026", "Public", "Official High School Athletic Association Match Schedule" },
+					new List<object> { "🌐 Public Parent Web Portal", "https://bc-tylertech.github.io/soccer/", "All Parents", "Live dark-mode website showing dinner status & game schedule" },
+					new List<object> { "📅 Official GoBound Match Schedule", "https://www.gobound.com/wi/wiaa/bsc/2026-27/oregon/jv2/schedule", "Public", "Official High School Athletic Association Match Schedule" },
 					new List<object> { "" },
 					new List<object> { "--- 📊 SPREADSHEET TAB NAVIGATION & GUIDE ---" },
 					new List<object> { "Tab Name", "Purpose & Contents", "Access Level", "Key Formulas / Automation" },
@@ -395,6 +395,19 @@ namespace HsSoccer.Services
 			var updateRequest = _service.Spreadsheets.Values.Update( valueRange, spreadsheetId, range );
 			updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
 			await updateRequest.ExecuteAsync();
+
+			// Explicitly clear and update cell B14 to purge old hyperlink formatting
+			try
+			{
+				var clearB14 = _service.Spreadsheets.Values.Clear( new ClearValuesRequest(), spreadsheetId, "'📌 Start Here (Dashboard)'!B14" );
+				await clearB14.ExecuteAsync();
+
+				var valB14 = new ValueRange { Values = new List<IList<object>> { new List<object> { "https://bc-tylertech.github.io/soccer/" } } };
+				var updateB14 = _service.Spreadsheets.Values.Update( valB14, spreadsheetId, "'📌 Start Here (Dashboard)'!B14" );
+				updateB14.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+				await updateB14.ExecuteAsync();
+			}
+			catch { }
 		}
 
 		public async Task SeedRosterAsync( string spreadsheetId, List<Player> players )
@@ -580,25 +593,50 @@ namespace HsSoccer.Services
 				await InitializeAsync();
 			}
 
-			var range = "Reimbursements!A1:G2";
+			var range = "Reimbursements!A1:J35";
 			var valueRange = new ValueRange
 			{
-				Values = new List<IList<object>>
-				{
-					new List<object>
-					{
-						"Timestamp", "Purchaser Name", "Purchase Date", "Expense Category", "Amount Spent ($)", "Description / Store", "Receipt Link"
-					},
-					new List<object>
-					{
-						"=IFERROR(FILTER('Form Responses 2'!A2:G, 'Form Responses 2'!A2:A<>\"), \"No reimbursement claims submitted yet\")"
-					}
-				}
+				Values = new List<IList<object>>()
 			};
+
+			valueRange.Values.Add( new List<object> { "--- 💵 CO-MANAGER REIMBURSEMENT CASH POOL SUMMARY ---" } );
+			valueRange.Values.Add( new List<object> { "Total Dues Collected (Roster):", "=IFERROR(SUM(Roster!H2:H), 0)" } );
+			valueRange.Values.Add( new List<object> { "Total Reimbursements Paid Out:", "=IFERROR(SUMIF(I8:I100, \"Paid\", E8:E100), 0)" } );
+			valueRange.Values.Add( new List<object> { "Current Available Cash Balance:", "=B2-B3", "", "=IF(B4<0, \"🚨 CRITICAL DEFICIT\", IF(B4<100, \"⚠️ LOW FUNDS\", \"🟢 HEALTHY BALANCE\"))" } );
+			valueRange.Values.Add( new List<object> { "" } );
+			valueRange.Values.Add( new List<object> { "--- 📋 SUBMITTED EXPENSE REIMBURSEMENT CLAIMS ---" } );
+
+			var headers = new List<object>
+			{
+				"Timestamp", "Purchaser Name", "Purchase Date", "Expense Category", "Amount Spent ($)", "Description / Store", "Receipt Link", "Fund Availability Check", "Reimbursement Status", "Reimbursed By"
+			};
+			valueRange.Values.Add( headers );
+
+			for ( int r = 8; r <= 35; r++ )
+			{
+				var rIndex = r;
+				var sourceRow = rIndex - 6; // Form Responses start at Row 2 (when r=8, sourceRow=2)
+
+				var row = new List<object>
+				{
+					"=IFERROR(INDEX('Expenses Responses'!A:A, " + sourceRow + "), IFERROR(INDEX('Form Responses 2'!A:A, " + sourceRow + "), \"\"))",
+					"=IFERROR(INDEX('Expenses Responses'!C:C, " + sourceRow + "), IFERROR(INDEX('Form Responses 2'!C:C, " + sourceRow + "), \"\"))",
+					"=IFERROR(INDEX('Expenses Responses'!D:D, " + sourceRow + "), IFERROR(INDEX('Form Responses 2'!D:D, " + sourceRow + "), \"\"))",
+					"=IFERROR(INDEX('Expenses Responses'!E:E, " + sourceRow + "), IFERROR(INDEX('Form Responses 2'!E:E, " + sourceRow + "), \"\"))",
+					"=IFERROR(INDEX('Expenses Responses'!F:F, " + sourceRow + "), IFERROR(INDEX('Form Responses 2'!F:F, " + sourceRow + "), \"\"))",
+					"=IFERROR(INDEX('Expenses Responses'!G:G, " + sourceRow + "), IFERROR(INDEX('Form Responses 2'!G:G, " + sourceRow + "), \"\"))",
+					"=IFERROR(INDEX('Expenses Responses'!H:H, " + sourceRow + "), IFERROR(INDEX('Form Responses 2'!H:H, " + sourceRow + "), \"\"))",
+					"=IF(LEN(A" + rIndex + ")=0, \"\", IF(I" + rIndex + "=\"Paid\", \"✅ Reimbursed\", IF(E" + rIndex + "<=$B$4, \"🟢 Approved (Funds Available)\", \"🔴 ON HOLD (Insufficient Funds)\")))",
+					"Pending",
+					""
+				};
+				valueRange.Values.Add( row );
+			}
 
 			var updateRequest = _service.Spreadsheets.Values.Update( valueRange, spreadsheetId, range );
 			updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
 			await updateRequest.ExecuteAsync();
+			Console.WriteLine( "SUCCESS: Seeded 'Reimbursements' tab with live dues cash pool formulas and fund availability guardrails!" );
 		}
 
 		public async Task SeedDuesLogAsync( string spreadsheetId )
