@@ -784,16 +784,18 @@ namespace HsSoccer.Services
 			foreach ( var slot in dinnerSlots )
 			{
 				var rIndex = valueRange.Values.Count + 1;
+				var dateMatchExpr = "(TEXT('Dinner Responses'!E$2:E, \"yyyy-mm-dd\")=A" + rIndex + ") + (TEXT('Dinner Responses'!E$2:E, \"m/d/yyyy\")=A" + rIndex + ") + ('Dinner Responses'!E$2:E=A" + rIndex + ") + ISNUMBER(SEARCH(A" + rIndex + ", 'Dinner Responses'!E$2:E & \"\"))";
+
 				var row = new List<object>
 				{
 					slot.Date,
 					slot.HostFamily,
 					slot.Location,
-					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\", (('Dinner Responses'!E$2:E=A" + rIndex + ") + ISNUMBER(SEARCH(A" + rIndex + ", 'Dinner Responses'!E$2:E)))*ISNUMBER(SEARCH(\"Main\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
-					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\", (('Dinner Responses'!E$2:E=A" + rIndex + ") + ISNUMBER(SEARCH(A" + rIndex + ", 'Dinner Responses'!E$2:E)))*ISNUMBER(SEARCH(\"Drink\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
-					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\", (('Dinner Responses'!E$2:E=A" + rIndex + ") + ISNUMBER(SEARCH(A" + rIndex + ", 'Dinner Responses'!E$2:E)))*ISNUMBER(SEARCH(\"Dessert\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
-					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\", (('Dinner Responses'!E$2:E=A" + rIndex + ") + ISNUMBER(SEARCH(A" + rIndex + ", 'Dinner Responses'!E$2:E)))*ISNUMBER(SEARCH(\"Side\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
-					"=COUNTIF('Dinner Responses'!E:E, A" + rIndex + ")",
+					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\", (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Main\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
+					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\", (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Drink\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
+					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\", (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Dessert\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
+					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\", (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Side\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
+					"=COUNTIF('Dinner Responses'!E:E, A" + rIndex + ") + COUNTIF('Dinner Responses'!E:E, TEXT(DATEVALUE(A" + rIndex + "), \"m/d/yyyy\"))",
 					"=IF(H" + rIndex + ">=4, \"FULL (4 Volunteers)\", IF(H" + rIndex + ">=3, \"Confirmed (3/4 Volunteers)\", \"Needs Volunteers (\" & (4-H" + rIndex + ") & \" Needed)\"))"
 				};
 				valueRange.Values.Add( row );
@@ -894,12 +896,28 @@ namespace HsSoccer.Services
 				}
 				catch { }
 
-				var range = "'Team Info'!A1:I" + masterData.Values.Count;
-				var valueRange = new ValueRange { Values = masterData.Values };
-				var updateRequest = _service.Spreadsheets.Values.Update( valueRange, publicSpreadsheetId, range );
-				updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
-				await updateRequest.ExecuteAsync();
-				Console.WriteLine( "SUCCESS: Synced " + masterData.Values.Count + " rows of computed public data from Master Sheet to Public Sheet Feed!" );
+				// Clear public sheet and set Cell A1 to dynamic IMPORTRANGE formula pointing to Master Sheet
+				try
+				{
+					var clearReq = _service.Spreadsheets.Values.Clear( new ClearValuesRequest(), publicSpreadsheetId, "'Team Info'!A1:Z100" );
+					await clearReq.ExecuteAsync();
+
+					var formulaVal = new ValueRange
+					{
+						Values = new List<IList<object>>
+						{
+							new List<object> { "=IMPORTRANGE(\"" + masterSpreadsheetId + "\", \"'Team Info'!A1:I30\")" }
+						}
+					};
+					var importReq = _service.Spreadsheets.Values.Update( formulaVal, publicSpreadsheetId, "'Team Info'!A1" );
+					importReq.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+					await importReq.ExecuteAsync();
+					Console.WriteLine( "SUCCESS: Configured Public Sheet Feed with dynamic real-time IMPORTRANGE formula!" );
+				}
+				catch ( Exception ex )
+				{
+					Console.WriteLine( "Warning setting IMPORTRANGE on public sheet: " + ex.Message );
+				}
 			}
 		}
 	}
