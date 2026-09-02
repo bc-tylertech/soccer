@@ -550,7 +550,7 @@ namespace HsSoccer.Services
 				await InitializeAsync();
 			}
 
-			var range = "Team Dinners!A1:I" + ( dinnerSlots.Count + 10 );
+			var range = "Team Dinners!A1:J" + ( dinnerSlots.Count + 10 );
 
 			var valueRange = new ValueRange
 			{
@@ -559,24 +559,27 @@ namespace HsSoccer.Services
 
 			var headers = new List<object>
 			{
-				"Dinner Date", "Host Family", "Location", "Main Course Volunteer", "Drinks Volunteer", "Dessert Volunteer", "Sides Volunteer", "Signed-Up Count", "Status"
+				"Dinner Date", "Host Family", "Location", "Main Course Co-Host 1", "Main Course Co-Host 2", "Drinks Volunteer", "Dessert Volunteer", "Sides Volunteer", "Signed-Up Count", "Status"
 			};
 			valueRange.Values.Add( headers );
 
 			foreach ( var slot in dinnerSlots )
 			{
 				var rIndex = valueRange.Values.Count + 1;
+				var dateMatchExpr = "(('Dinner Responses'!E$2:E=A" + rIndex + ") + ISNUMBER(SEARCH(A" + rIndex + ", 'Dinner Responses'!E$2:E)))";
+
 				var row = new List<object>
 				{
 					slot.Date,
 					slot.HostFamily,
 					slot.Location,
-					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\" & IF(LEN('Dinner Responses'!G$2:G)>0, \" - \" & 'Dinner Responses'!G$2:G, \"\"), (('Dinner Responses'!E$2:E=A" + rIndex + ") + ISNUMBER(SEARCH(A" + rIndex + ", 'Dinner Responses'!E$2:E)))*ISNUMBER(SEARCH(\"Main\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
-					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\" & IF(LEN('Dinner Responses'!G$2:G)>0, \" - \" & 'Dinner Responses'!G$2:G, \"\"), (('Dinner Responses'!E$2:E=A" + rIndex + ") + ISNUMBER(SEARCH(A" + rIndex + ", 'Dinner Responses'!E$2:E)))*ISNUMBER(SEARCH(\"Drink\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
-					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\" & IF(LEN('Dinner Responses'!G$2:G)>0, \" - \" & 'Dinner Responses'!G$2:G, \"\"), (('Dinner Responses'!E$2:E=A" + rIndex + ") + ISNUMBER(SEARCH(A" + rIndex + ", 'Dinner Responses'!E$2:E)))*ISNUMBER(SEARCH(\"Dessert\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
-					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\" & IF(LEN('Dinner Responses'!G$2:G)>0, \" - \" & 'Dinner Responses'!G$2:G, \"\"), (('Dinner Responses'!E$2:E=A" + rIndex + ") + ISNUMBER(SEARCH(A" + rIndex + ", 'Dinner Responses'!E$2:E)))*ISNUMBER(SEARCH(\"Side\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
-					"=SUMPRODUCT((('Dinner Responses'!E$2:E=A" + rIndex + ") + ISNUMBER(SEARCH(A" + rIndex + ", 'Dinner Responses'!E$2:E))) * ('Dinner Responses'!F$2:F<=\"~\"))",
-					"=IF(H" + rIndex + ">=5, \"FULL (5 Volunteers)\", IF(H" + rIndex + ">=4, \"Confirmed (4/5 Volunteers)\", IF(H" + rIndex + ">=3, \"Confirmed (3/5 Volunteers)\", \"Needs Volunteers (\" & (5-H" + rIndex + ") & \" Needed)\")))"
+					"=IFERROR(INDEX(FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\" & IF(LEN('Dinner Responses'!G$2:G)>0, \" - \" & 'Dinner Responses'!G$2:G, \"\"), (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Main\", 'Dinner Responses'!F$2:F))), 1), \"Unassigned\")",
+					"=IFERROR(INDEX(FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\" & IF(LEN('Dinner Responses'!G$2:G)>0, \" - \" & 'Dinner Responses'!G$2:G, \"\"), (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Main\", 'Dinner Responses'!F$2:F))), 2), \"Unassigned\")",
+					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\" & IF(LEN('Dinner Responses'!G$2:G)>0, \" - \" & 'Dinner Responses'!G$2:G, \"\"), (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Drink\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
+					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\" & IF(LEN('Dinner Responses'!G$2:G)>0, \" - \" & 'Dinner Responses'!G$2:G, \"\"), (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Dessert\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
+					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\" & IF(LEN('Dinner Responses'!G$2:G)>0, \" - \" & 'Dinner Responses'!G$2:G, \"\"), (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Side\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
+					"=(D" + rIndex + "<>\"Unassigned\") + (E" + rIndex + "<>\"Unassigned\") + (F" + rIndex + "<>\"Unassigned\") + (G" + rIndex + "<>\"Unassigned\") + (H" + rIndex + "<>\"Unassigned\")",
+					"=IF(I" + rIndex + ">=5, \"FULL (5 Volunteers)\", IF(I" + rIndex + ">=4, \"Confirmed (4/5 Volunteers)\", IF(I" + rIndex + ">=3, \"Confirmed (3/5 Volunteers)\", \"Needs Volunteers (\" & (5-I" + rIndex + ") & \" Needed)\")))"
 				};
 				valueRange.Values.Add( row );
 			}
@@ -783,7 +786,7 @@ namespace HsSoccer.Services
 
 			foreach ( var slot in dinnerSlots )
 			{
-				var rIndex = valueRange.Values.Count;
+				var rIndex = valueRange.Values.Count + 1;
 				var dateMatchExpr = "(TEXT('Dinner Responses'!E$2:E, \"yyyy-mm-dd\")=A" + rIndex + ") + (TEXT('Dinner Responses'!E$2:E, \"m/d/yyyy\")=A" + rIndex + ") + ('Dinner Responses'!E$2:E=A" + rIndex + ") + ISNUMBER(SEARCH(A" + rIndex + ", 'Dinner Responses'!E$2:E & \"\"))";
 
 				var row = new List<object>
