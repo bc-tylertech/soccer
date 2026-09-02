@@ -348,10 +348,10 @@ function parseCSVToDinners(csvText) {
 			const formattedDate = formatDinnerDate(dateStr);
 			const host = cols[1] || 'Huntoon Concessions';
 			const loc = cols[2] || 'Huntoon Concessions';
-			const main = cols[3] || 'Unassigned';
-			const drinks = cols[4] || 'Unassigned';
-			const dessert = cols[5] || 'Unassigned';
-			const sides = cols[6] || 'Unassigned';
+			const main = formatVolunteerName(cols[3]);
+			const drinks = formatVolunteerName(cols[4]);
+			const dessert = formatVolunteerName(cols[5]);
+			const sides = formatVolunteerName(cols[6]);
 
 			let count = 0;
 			if (main && main !== 'Unassigned') count++;
@@ -360,13 +360,9 @@ function parseCSVToDinners(csvText) {
 			if (sides && sides !== 'Unassigned') count++;
 
 			const needed = Math.max(0, 4 - count);
-			let status = cols[8] || (count >= 4 ? 'FULL (4 Volunteers)' : (count >= 3 ? `Confirmed (${count}/4 Volunteers)` : `Needs Volunteers (${needed} Needed)`));
-			if (status.includes('#REF!')) {
-				status = count >= 4 ? 'FULL (4 Volunteers)' : (count >= 3 ? `Confirmed (${count}/4 Volunteers)` : `Needs Volunteers (${needed} Needed)`);
-			}
-
-			const statusClass = status.includes('FULL') ? 'status-full' : (status.includes('Confirmed') ? 'status-confirmed' : 'status-needs');
-			const fillClass = status.includes('FULL') ? 'fill-full' : (status.includes('Confirmed') ? 'fill-confirmed' : 'fill-needs');
+			const status = count >= 4 ? 'FULL (4 Volunteers)' : (count >= 3 ? `Confirmed (${count}/4 Volunteers)` : `Needs Volunteers (${needed} Needed)`);
+			const statusClass = count >= 4 ? 'status-full' : (count >= 3 ? 'status-confirmed' : 'status-needs');
+			const fillClass = count >= 4 ? 'fill-full' : (count >= 3 ? 'fill-confirmed' : 'fill-needs');
 
 			dinners.push({
 				date: formattedDate,
@@ -384,6 +380,11 @@ function parseCSVToDinners(csvText) {
 		}
 	}
 	return dinners;
+}
+
+function formatVolunteerName(str) {
+	if (!str || str === 'Unassigned') return 'Unassigned';
+	return str.replace(/\(([^,\)]+),\s*([^\(\)]+)\s*\([^)]*\)\)/g, '($2)');
 }
 
 function renderDinnerCards(dinners) {
