@@ -575,7 +575,7 @@ namespace HsSoccer.Services
 					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\" & IF(LEN('Dinner Responses'!G$2:G)>0, \" - \" & 'Dinner Responses'!G$2:G, \"\"), (('Dinner Responses'!E$2:E=A" + rIndex + ") + ISNUMBER(SEARCH(A" + rIndex + ", 'Dinner Responses'!E$2:E)))*ISNUMBER(SEARCH(\"Drink\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
 					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\" & IF(LEN('Dinner Responses'!G$2:G)>0, \" - \" & 'Dinner Responses'!G$2:G, \"\"), (('Dinner Responses'!E$2:E=A" + rIndex + ") + ISNUMBER(SEARCH(A" + rIndex + ", 'Dinner Responses'!E$2:E)))*ISNUMBER(SEARCH(\"Dessert\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
 					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\" & IF(LEN('Dinner Responses'!G$2:G)>0, \" - \" & 'Dinner Responses'!G$2:G, \"\"), (('Dinner Responses'!E$2:E=A" + rIndex + ") + ISNUMBER(SEARCH(A" + rIndex + ", 'Dinner Responses'!E$2:E)))*ISNUMBER(SEARCH(\"Side\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
-					"=COUNTIF('Dinner Responses'!E:E, A" + rIndex + ")",
+					"=IF(D" + rIndex + "=\"Unassigned\", 0, LEN(D" + rIndex + ")-LEN(SUBSTITUTE(D" + rIndex + ", \",\", \"\"))+1) + (E" + rIndex + "<>\"Unassigned\") + (F" + rIndex + "<>\"Unassigned\") + (G" + rIndex + "<>\"Unassigned\")",
 					"=IF(H" + rIndex + ">=5, \"FULL (5 Volunteers)\", IF(H" + rIndex + ">=4, \"Confirmed (4/5 Volunteers)\", IF(H" + rIndex + ">=3, \"Confirmed (3/5 Volunteers)\", \"Needs Volunteers (\" & (5-H" + rIndex + ") & \" Needed)\")))"
 				};
 				valueRange.Values.Add( row );
@@ -795,7 +795,7 @@ namespace HsSoccer.Services
 					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\", (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Drink\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
 					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\", (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Dessert\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
 					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\", (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Side\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
-					"=COUNTIF('Dinner Responses'!E:E, A" + rIndex + ") + COUNTIF('Dinner Responses'!E:E, TEXT(DATEVALUE(A" + rIndex + "), \"m/d/yyyy\"))",
+					"=IF(D" + rIndex + "=\"Unassigned\", 0, LEN(D" + rIndex + ")-LEN(SUBSTITUTE(D" + rIndex + ", \",\", \"\"))+1) + (E" + rIndex + "<>\"Unassigned\") + (F" + rIndex + "<>\"Unassigned\") + (G" + rIndex + "<>\"Unassigned\")",
 					"=IF(H" + rIndex + ">=5, \"FULL (5 Volunteers)\", IF(H" + rIndex + ">=4, \"Confirmed (4/5 Volunteers)\", IF(H" + rIndex + ">=3, \"Confirmed (3/5 Volunteers)\", \"Needs Volunteers (\" & (5-H" + rIndex + ") & \" Needed)\")))"
 				};
 				valueRange.Values.Add( row );
