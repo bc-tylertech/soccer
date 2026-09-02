@@ -359,16 +359,16 @@ function parseCSVToDinners(csvText) {
 			if (dessert && dessert !== 'Unassigned') count++;
 			if (sides && sides !== 'Unassigned') count++;
 
-			const needed = Math.max(0, 4 - count);
-			const status = count >= 4 ? 'FULL (4 Volunteers)' : (count >= 3 ? `Confirmed (${count}/4 Volunteers)` : `Needs Volunteers (${needed} Needed)`);
-			const statusClass = count >= 4 ? 'status-full' : (count >= 3 ? 'status-confirmed' : 'status-needs');
-			const fillClass = count >= 4 ? 'fill-full' : (count >= 3 ? 'fill-confirmed' : 'fill-needs');
+			const needed = Math.max(0, 5 - count);
+			const status = count >= 5 ? 'FULL (5 Volunteers)' : (count >= 3 ? `Confirmed (${count}/5 Volunteers)` : `Needs Volunteers (${needed} Needed)`);
+			const statusClass = count >= 5 ? 'status-full' : (count >= 3 ? 'status-confirmed' : 'status-needs');
+			const fillClass = count >= 5 ? 'fill-full' : (count >= 3 ? 'fill-confirmed' : 'fill-needs');
 
 			dinners.push({
 				date: formattedDate,
 				location: loc,
 				count: count,
-				max: 4,
+				max: 5,
 				status: status,
 				statusClass: statusClass,
 				fillClass: fillClass,
@@ -407,7 +407,7 @@ function renderDinnerCards(dinners) {
 					<div class="capacity-container">
 						<div class="capacity-label">
 							<span>Volunteers Signed Up</span>
-							<span><strong>${d.count}</strong> / ${d.max} (Max 4)</span>
+							<span><strong>${d.count}</strong> / ${d.max} (Max 5)</span>
 						</div>
 						<div class="progress-bar-bg">
 							<div class="progress-bar-fill ${d.fillClass}" style="width: ${percent}%;"></div>
@@ -434,7 +434,7 @@ function renderDinnerCards(dinners) {
 					</ul>
 				</div>
 
-				${d.count >= 4 
+				${d.count >= 5 
 					? '' 
 					: `<div style="margin-top: 1rem;"><a href="https://docs.google.com/forms/d/1Ol68WmioL42GO_n47N6Cq3g30o_meeqYk9Hjn2SqPD8/viewform" target="_blank" class="btn btn-primary" style="width:100%; justify-content:center;">Sign Up For This Date</a></div>`
 				}
