@@ -348,13 +348,17 @@ function parseCSVToDinners(csvText) {
 			const formattedDate = formatDinnerDate(dateStr);
 			const host = cols[1] || 'Huntoon Concessions';
 			const loc = cols[2] || 'Huntoon Concessions';
-			const main = formatVolunteerName(cols[3]);
+			const rawMain = cols[3] || 'Unassigned';
+			const mainParts = parseMainCoHosts(rawMain);
+			const main1 = mainParts[0] || 'Unassigned';
+			const main2 = mainParts[1] || 'Unassigned';
 			const drinks = formatVolunteerName(cols[4]);
 			const dessert = formatVolunteerName(cols[5]);
 			const sides = formatVolunteerName(cols[6]);
 
 			let count = 0;
-			if (main && main !== 'Unassigned') count++;
+			if (main1 && main1 !== 'Unassigned') count++;
+			if (main2 && main2 !== 'Unassigned') count++;
 			if (drinks && drinks !== 'Unassigned') count++;
 			if (dessert && dessert !== 'Unassigned') count++;
 			if (sides && sides !== 'Unassigned') count++;
@@ -372,7 +376,8 @@ function parseCSVToDinners(csvText) {
 				status: status,
 				statusClass: statusClass,
 				fillClass: fillClass,
-				main: main,
+				main1: main1,
+				main2: main2,
 				drinks: drinks,
 				dessert: dessert,
 				sides: sides
@@ -382,9 +387,17 @@ function parseCSVToDinners(csvText) {
 	return dinners;
 }
 
+function parseMainCoHosts(rawStr) {
+	if (!rawStr || rawStr === 'Unassigned') return ['Unassigned', 'Unassigned'];
+	const parts = rawStr.split(',').map(s => formatVolunteerName(s.trim())).filter(s => s && s !== 'Unassigned');
+	return [parts[0] || 'Unassigned', parts[1] || 'Unassigned'];
+}
+
 function formatVolunteerName(str) {
 	if (!str || str === 'Unassigned') return 'Unassigned';
-	return str.replace(/\(([^,\)]+),\s*([^\(\)]+)\s*\([^)]*\)\)/g, '($2)');
+	let cleaned = str.replace(/\(([^,\)]+),\s*([^\(\)]+)\s*\([^)]*\)\)/g, '($2)');
+	cleaned = cleaned.replace(/\s+\)/g, ')').trim();
+	return cleaned;
 }
 
 function renderDinnerCards(dinners) {
@@ -416,8 +429,12 @@ function renderDinnerCards(dinners) {
 
 					<ul class="slots-list">
 						<li class="slot-item">
-							<span class="slot-role">🥗 Main:</span>
-							<span class="${d.main === 'Unassigned' ? 'slot-empty' : 'slot-volunteer'}">${d.main}</span>
+							<span class="slot-role">🥗 Main Co-Host 1:</span>
+							<span class="${d.main1 === 'Unassigned' ? 'slot-empty' : 'slot-volunteer'}">${d.main1}</span>
+						</li>
+						<li class="slot-item">
+							<span class="slot-role">🥗 Main Co-Host 2:</span>
+							<span class="${d.main2 === 'Unassigned' ? 'slot-empty' : 'slot-volunteer'}">${d.main2}</span>
 						</li>
 						<li class="slot-item">
 							<span class="slot-role">🥤 Drinks:</span>
