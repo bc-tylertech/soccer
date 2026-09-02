@@ -760,7 +760,7 @@ namespace HsSoccer.Services
 			}
 			catch { }
 
-			var range = "'Team Info'!A1:I30";
+			var range = "'Team Info'!A1:J30";
 			var valueRange = new ValueRange
 			{
 				Values = new List<IList<object>>
@@ -777,13 +777,13 @@ namespace HsSoccer.Services
 					new List<object> { "Budget Dinner Coach", "$200.00" },
 					new List<object> { "" },
 					new List<object> { "--- 🥗 LIVE TEAM DINNER SIGN-UP STATUS (PUBLIC) ---" },
-					new List<object> { "Dinner Date", "Host Family", "Location", "Main Course Volunteer", "Drinks Volunteer", "Dessert Volunteer", "Sides Volunteer", "Signed-Up Count", "Status" }
+					new List<object> { "Dinner Date", "Host Family", "Location", "Main Co-Host #1", "Main Co-Host #2", "Drinks Volunteer", "Dessert Volunteer", "Sides Volunteer", "Signed-Up Count", "Status" }
 				}
 			};
 
 			foreach ( var slot in dinnerSlots )
 			{
-				var rIndex = valueRange.Values.Count + 1;
+				var rIndex = valueRange.Values.Count;
 				var dateMatchExpr = "(TEXT('Dinner Responses'!E$2:E, \"yyyy-mm-dd\")=A" + rIndex + ") + (TEXT('Dinner Responses'!E$2:E, \"m/d/yyyy\")=A" + rIndex + ") + ('Dinner Responses'!E$2:E=A" + rIndex + ") + ISNUMBER(SEARCH(A" + rIndex + ", 'Dinner Responses'!E$2:E & \"\"))";
 
 				var row = new List<object>
@@ -791,12 +791,13 @@ namespace HsSoccer.Services
 					slot.Date,
 					slot.HostFamily,
 					slot.Location,
-					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\", (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Main\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
+					"=IFERROR(INDEX(FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\", (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Main\", 'Dinner Responses'!F$2:F))), 1), \"Unassigned\")",
+					"=IFERROR(INDEX(FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\", (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Main\", 'Dinner Responses'!F$2:F))), 2), \"Unassigned\")",
 					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\", (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Drink\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
 					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\", (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Dessert\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
 					"=IFERROR(TEXTJOIN(\", \", TRUE, FILTER('Dinner Responses'!C$2:C & \" (\" & 'Dinner Responses'!D$2:D & \")\", (" + dateMatchExpr + ")*ISNUMBER(SEARCH(\"Side\", 'Dinner Responses'!F$2:F)))), \"Unassigned\")",
-					"=SUMPRODUCT((" + dateMatchExpr + ") * ('Dinner Responses'!F$2:F<=\"~\"))",
-					"=IF(H" + rIndex + ">=5, \"FULL (5 Volunteers)\", IF(H" + rIndex + ">=4, \"Confirmed (4/5 Volunteers)\", IF(H" + rIndex + ">=3, \"Confirmed (3/5 Volunteers)\", \"Needs Volunteers (\" & (5-H" + rIndex + ") & \" Needed)\")))"
+					"=(D" + rIndex + "<>\"Unassigned\") + (E" + rIndex + "<>\"Unassigned\") + (F" + rIndex + "<>\"Unassigned\") + (G" + rIndex + "<>\"Unassigned\") + (H" + rIndex + "<>\"Unassigned\")",
+					"=IF(I" + rIndex + ">=5, \"FULL (5 Volunteers)\", IF(I" + rIndex + ">=4, \"Confirmed (4/5 Volunteers)\", IF(I" + rIndex + ">=3, \"Confirmed (3/5 Volunteers)\", \"Needs Volunteers (\" & (5-I" + rIndex + ") & \" Needed)\")))"
 				};
 				valueRange.Values.Add( row );
 			}
@@ -860,7 +861,7 @@ namespace HsSoccer.Services
 			}
 
 			Console.WriteLine( "Reading computed public summary from Master Sheet 'Team Info' tab..." );
-			var getReq = _service.Spreadsheets.Values.Get( masterSpreadsheetId, "'Team Info'!A1:I30" );
+			var getReq = _service.Spreadsheets.Values.Get( masterSpreadsheetId, "'Team Info'!A1:J30" );
 			var masterData = await getReq.ExecuteAsync();
 
 			if ( masterData.Values != null && masterData.Values.Count > 0 )
@@ -896,17 +897,14 @@ namespace HsSoccer.Services
 				}
 				catch { }
 
-				// Clear public sheet and set Cell A1 to dynamic IMPORTRANGE formula pointing to Master Sheet
+				// Set Cell A1 to dynamic IMPORTRANGE formula pointing to Master Sheet
 				try
 				{
-					var clearReq = _service.Spreadsheets.Values.Clear( new ClearValuesRequest(), publicSpreadsheetId, "'Team Info'!A1:Z100" );
-					await clearReq.ExecuteAsync();
-
 					var formulaVal = new ValueRange
 					{
 						Values = new List<IList<object>>
 						{
-							new List<object> { "=IMPORTRANGE(\"" + masterSpreadsheetId + "\", \"'Team Info'!A1:I30\")" }
+							new List<object> { "=IMPORTRANGE(\"" + masterSpreadsheetId + "\", \"'Team Info'!A1:J30\")" }
 						}
 					};
 					var importReq = _service.Spreadsheets.Values.Update( formulaVal, publicSpreadsheetId, "'Team Info'!A1" );
