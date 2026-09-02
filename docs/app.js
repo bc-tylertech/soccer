@@ -434,12 +434,10 @@ function renderDinnerCards(dinners) {
 					</ul>
 				</div>
 
-				<div style="margin-top: 1rem;">
-					${d.count >= 4 
-						? `<button class="btn btn-secondary" style="width:100%; cursor:not-allowed; opacity:0.6;" disabled>Date Full (Max 4 Reached)</button>`
-						: `<a href="https://docs.google.com/forms/d/1Ol68WmioL42GO_n47N6Cq3g30o_meeqYk9Hjn2SqPD8/viewform" target="_blank" class="btn btn-primary" style="width:100%; justify-content:center;">Sign Up For This Date</a>`
-					}
-				</div>
+				${d.count >= 4 
+					? '' 
+					: `<div style="margin-top: 1rem;"><a href="https://docs.google.com/forms/d/1Ol68WmioL42GO_n47N6Cq3g30o_meeqYk9Hjn2SqPD8/viewform" target="_blank" class="btn btn-primary" style="width:100%; justify-content:center;">Sign Up For This Date</a></div>`
+				}
 			</div>
 		`;
 	}).join('');
