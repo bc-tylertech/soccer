@@ -389,13 +389,15 @@ function parseCSVToDinners(csvText) {
 
 function parseMainCoHosts(rawStr) {
 	if (!rawStr || rawStr === 'Unassigned') return ['Unassigned', 'Unassigned'];
-	const parts = rawStr.split(',').map(s => formatVolunteerName(s.trim())).filter(s => s && s !== 'Unassigned');
+	const cleanedStr = formatVolunteerName(rawStr);
+	const parts = cleanedStr.split(',').map(s => s.trim()).filter(s => s && s !== 'Unassigned');
 	return [parts[0] || 'Unassigned', parts[1] || 'Unassigned'];
 }
 
 function formatVolunteerName(str) {
 	if (!str || str === 'Unassigned') return 'Unassigned';
-	let cleaned = str.replace(/\(([^,\)]+),\s*([^\(\)]+)\s*\([^)]*\)\)/g, '($2)');
+	let cleaned = str.replace(/([^\(\)]+)\s*\(([^,\)]+),\s*([^\(\)]+)\s*\([^)]*\)\)/g, '$1 ($3)');
+	cleaned = cleaned.replace(/\(([^,\)]+),\s*([^\(\)]+)\)/g, '($2)');
 	cleaned = cleaned.replace(/\s+\)/g, ')').trim();
 	return cleaned;
 }
