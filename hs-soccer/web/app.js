@@ -348,13 +348,11 @@ function parseCSVToDinners(csvText) {
 			const formattedDate = formatDinnerDate(dateStr);
 			const host = cols[1] || 'Huntoon Concessions';
 			const loc = cols[2] || 'Huntoon Concessions';
-			const rawMain = cols[3] || 'Unassigned';
-			const mainParts = parseMainCoHosts(rawMain);
-			const main1 = mainParts[0] || 'Unassigned';
-			const main2 = mainParts[1] || 'Unassigned';
-			const drinks = formatVolunteerName(cols[4]);
-			const dessert = formatVolunteerName(cols[5]);
-			const sides = formatVolunteerName(cols[6]);
+			const main1 = formatVolunteerName(cols[3]);
+			const main2 = formatVolunteerName(cols[4]);
+			const drinks = formatVolunteerName(cols[5]);
+			const dessert = formatVolunteerName(cols[6]);
+			const sides = formatVolunteerName(cols[7]);
 
 			let count = 0;
 			if (main1 && main1 !== 'Unassigned') count++;
