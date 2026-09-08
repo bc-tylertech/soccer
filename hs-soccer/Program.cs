@@ -199,12 +199,13 @@ namespace HsSoccer
 						var sheetsDinnerSync = new GoogleSheetsService();
 						await sheetsDinnerSync.InitializeAsync();
 
-						Console.WriteLine( "Updating Private Master Sheet ('Team Dinners', 'Team Info', Dashboard, and Reimbursements)..." );
+						Console.WriteLine( "Updating Private Master Sheet ('Team Dinners', 'Team Info', Dashboard, Reimbursements, and Roster)..." );
 						var defaultDinners = rosterManager.GenerateDefaultDinnerSlots();
 						await sheetsDinnerSync.SeedDinnersAsync( sheetIdToUse, defaultDinners );
 						await sheetsDinnerSync.SeedTeamInfoTabAsync( sheetIdToUse, defaultDinners );
 						await sheetsDinnerSync.SeedDashboardTabAsync( sheetIdToUse );
 						await sheetsDinnerSync.SeedReimbursementsAsync( sheetIdToUse );
+						await sheetsDinnerSync.SeedRosterDuesFormulasAsync( sheetIdToUse );
 
 						Console.WriteLine( "Syncing computed public data to Public Sheet Feed ('" + publicSheetIdToUse + "')..." );
 						await sheetsDinnerSync.SyncPublicSheetFromMasterAsync( sheetIdToUse, publicSheetIdToUse );
