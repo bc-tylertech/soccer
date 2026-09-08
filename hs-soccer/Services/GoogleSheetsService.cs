@@ -642,6 +642,43 @@ namespace HsSoccer.Services
 			Console.WriteLine( "SUCCESS: Seeded 'Reimbursements' tab with live dues cash pool formulas and fund availability guardrails!" );
 		}
 
+		public async Task SeedRosterDuesFormulasAsync( string spreadsheetId )
+		{
+			if ( _service == null )
+			{
+				await InitializeAsync();
+			}
+
+			var range = "Roster!H2:J30";
+			var valueRange = new ValueRange
+			{
+				Values = new List<IList<object>>()
+			};
+
+			for ( int r = 2; r <= 30; r++ )
+			{
+				var row = new List<object>
+				{
+					"=IFERROR(SUMPRODUCT(('Form Responses 3'!D$2:D) * ISNUMBER(SEARCH(A" + r + ", 'Form Responses 3'!C$2:C)) * ISNUMBER(SEARCH(B" + r + ", 'Form Responses 3'!C$2:C))), 0)",
+					"=G" + r + "-H" + r,
+					"=IF(H" + r + ">=G" + r + ", \"PAID\", \"UNPAID\")"
+				};
+				valueRange.Values.Add( row );
+			}
+
+			try
+			{
+				var updateRequest = _service.Spreadsheets.Values.Update( valueRange, spreadsheetId, range );
+				updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+				await updateRequest.ExecuteAsync();
+				Console.WriteLine( "SUCCESS: Updated Roster Dues Paid formulas to require First + Last Name matching!" );
+			}
+			catch ( Exception ex )
+			{
+				Console.WriteLine( "Note updating Roster formulas: " + ex.Message );
+			}
+		}
+
 		public async Task SeedDuesLogAsync( string spreadsheetId )
 		{
 			if ( _service == null )
