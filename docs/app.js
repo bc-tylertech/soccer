@@ -83,7 +83,7 @@ const scheduleData = [
 	{ date: "Tue 9/01", time: "5:30 PM", category: "Game", title: "vs Sun Prairie West", location: "Jaycee Community Park Field 1", tagClass: "tag-game" },
 	{ date: "Thu 9/03", time: "5:00 PM", category: "Game", title: "@ Sauk Prairie", location: "Sauk Prairie Middle School", tagClass: "tag-game" },
 	{ date: "Sat 9/05", time: "12:00 PM", category: "Game", title: "vs Verona", location: "Jaycee Community Park Field 1", tagClass: "tag-game" },
-	{ date: "Tue 9/08", time: "5:00 PM", category: "Game", title: "@ Madison West", location: "Cherokee Heights Middle School", tagClass: "tag-game" },
+	{ date: "Tue 9/08", time: "POSTPONED", category: "Game", title: "@ Madison West (Postponed)", location: "Cherokee Heights Middle School", tagClass: "tag-game" },
 	{ date: "Wed 9/09", time: "5:45 PM", category: "Service", title: "Bingo with Residents at The Beehive", location: "Beehive Retirement Home", tagClass: "tag-bonding" },
 	{ date: "Sat 9/12", time: "9:00 AM", category: "Tournament", title: "Waunakee JV2 Boys Soccer Invite", location: "Waunakee High School Warrior Pitch", tagClass: "tag-game" },
 	{ date: "Mon 9/14", time: "Post-Practice", category: "Dinner", title: "Team Dinner #2", location: "Huntoon Concessions", tagClass: "tag-dinner" },
