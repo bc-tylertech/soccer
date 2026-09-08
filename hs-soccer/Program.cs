@@ -213,6 +213,13 @@ namespace HsSoccer
 						Console.WriteLine( "SUCCESS: Both Private Master Sheet and Public Sheet Feed updated!" );
 						break;
 
+					case "debug-noah":
+						var masterSheetId = "1Cmpw5ENypjUQmuzkmfoYIsimyHQjL8AjI1WxMHVcXnA";
+						var debugSheetsSvc = new GoogleSheetsService();
+						await debugSheetsSvc.InitializeAsync();
+						await debugSheetsSvc.DebugNoahAsync( masterSheetId );
+						break;
+
 					case "create-public-sheet":
 						var masterId = string.IsNullOrWhiteSpace( targetSheetId ) ? "1Cmpw5ENypjUQmuzkmfoYIsimyHQjL8AjI1WxMHVcXnA" : targetSheetId;
 						var sheetsSvcPublic = new GoogleSheetsService();
@@ -244,6 +251,44 @@ namespace HsSoccer
 						var formsSvcSync = new GoogleFormsService();
 						await formsSvcSync.InitializeAsync();
 						await formsSvcSync.ConfigureDuesFormAsync( "1RnY-KJ-r29IKLJN_rtXYahsWdu6TNepmpINRRY4No18", allRosterPlayers );
+						break;
+
+					case "create-sub-order-form":
+					case "create-waunakee-form":
+					case "configure-sub-order-form":
+						var targetFormId = args.Length > 1 ? args[1] : string.Empty;
+						var masterIdForSub = "1Cmpw5ENypjUQmuzkmfoYIsimyHQjL8AjI1WxMHVcXnA";
+
+						Console.WriteLine( "Reading roster players for Waunakee Sub Order Form..." );
+						var subRosterPlayers = rosterManager.LoadRosterSeed();
+
+						var subFormsSvc = new GoogleFormsService();
+						await subFormsSvc.InitializeAsync();
+
+						Google.Apis.Forms.v1.Data.Form configuredSubForm = null;
+						if ( string.IsNullOrWhiteSpace( targetFormId ) )
+						{
+							Console.WriteLine( "Creating new standalone Waunakee Sub Order Form..." );
+							configuredSubForm = await subFormsSvc.CreateAndConfigureWaunakeeSubOrderFormAsync( subRosterPlayers );
+						}
+						else
+						{
+							Console.WriteLine( "Configuring existing Waunakee Sub Order Form (ID: " + targetFormId + ")..." );
+							configuredSubForm = await subFormsSvc.ConfigureWaunakeeSubOrderFormAsync( targetFormId, subRosterPlayers );
+						}
+
+						Console.WriteLine( "Setting up 'Sub Order Responses' tab on Master Google Sheet..." );
+						var subSheetsSvc = new GoogleSheetsService();
+						await subSheetsSvc.InitializeAsync();
+						await subSheetsSvc.SetupSubOrderResponsesTabAsync( masterIdForSub );
+
+						Console.WriteLine( "=========================================================================" );
+						Console.WriteLine( "WAUNAKEE TOURNAMENT SUB ORDER FORM READY!" );
+						Console.WriteLine( "Form Title:     " + configuredSubForm.Info.Title );
+						Console.WriteLine( "Form ID:        " + configuredSubForm.FormId );
+						Console.WriteLine( "Edit URL:       https://docs.google.com/forms/d/" + configuredSubForm.FormId + "/edit" );
+						Console.WriteLine( "Responder URL:  " + configuredSubForm.ResponderUri );
+						Console.WriteLine( "=========================================================================" );
 						break;
 
 					case "clean-form-tabs":
