@@ -336,5 +336,227 @@ namespace HsSoccer.Services
 			var createdForm = await _formsService.Forms.Create( form ).ExecuteAsync();
 			return await _formsService.Forms.Get( createdForm.FormId ).ExecuteAsync();
 		}
+
+		public async Task<Form> CreateAndConfigureWaunakeeSubOrderFormAsync( List<Player> rosterPlayers )
+		{
+			if ( _formsService == null )
+			{
+				await InitializeAsync();
+			}
+
+			Console.WriteLine( "Creating new standalone Google Form for Waunakee Sub Orders..." );
+			string formId = null;
+			try
+			{
+				var driveFile = new Google.Apis.Drive.v3.Data.File
+				{
+					Name = "Oregon JV2 Soccer - Waunakee Tournament Sub Order Form",
+					MimeType = "application/vnd.google-apps.form",
+					Parents = new List<string> { "1q7vy8NL92cbpIQOI-7BmI0DuLISrX0Yp" }
+				};
+				var createdDriveFile = await _driveService.Files.Create( driveFile ).ExecuteAsync();
+				formId = createdDriveFile.Id;
+				Console.WriteLine( "SUCCESS: Created Google Form via Drive API in target folder (Form ID: " + formId + ")" );
+			}
+			catch ( Exception ex )
+			{
+				Console.WriteLine( "Drive API create attempt failed: " + ex.Message + ". Attempting Forms API create..." );
+				var form = new Form
+				{
+					Info = new Info
+					{
+						Title = "Oregon JV2 Soccer - Waunakee Tournament Sub Order Form",
+						DocumentTitle = "Waunakee Tournament Sub Order Form"
+					}
+				};
+				var createdForm = await _formsService.Forms.Create( form ).ExecuteAsync();
+				formId = createdForm.FormId;
+				Console.WriteLine( "SUCCESS: Created Google Form via Forms API (Form ID: " + formId + ")" );
+			}
+
+			return await ConfigureWaunakeeSubOrderFormAsync( formId, rosterPlayers );
+		}
+
+		public async Task<Form> ConfigureWaunakeeSubOrderFormAsync( string formId, List<Player> rosterPlayers )
+		{
+			if ( _formsService == null )
+			{
+				await InitializeAsync();
+			}
+
+			Console.WriteLine( "Configuring Waunakee Sub Order Form (ID: " + formId + ")..." );
+			var currentForm = await _formsService.Forms.Get( formId ).ExecuteAsync();
+
+			var requests = new List<Request>();
+
+			requests.Add( new Request
+			{
+				UpdateFormInfo = new UpdateFormInfoRequest
+				{
+					Info = new Info
+					{
+						Title = "Oregon JV2 Soccer - Waunakee Tournament Sub Order Form",
+						Description = "Select your Jimmy John's sub and chip choice for the Waunakee Tournament."
+					},
+					UpdateMask = "title,description"
+				}
+			} );
+
+			if ( currentForm.Items != null && currentForm.Items.Count > 0 )
+			{
+				for ( int i = currentForm.Items.Count - 1; i >= 0; i-- )
+				{
+					requests.Add( new Request
+					{
+						DeleteItem = new DeleteItemRequest
+						{
+							Location = new Location { Index = i }
+						}
+					} );
+				}
+			}
+
+			var playerOptions = rosterPlayers.Select( p => new Option { Value = p.LastName + ", " + p.FirstName + " (Grade " + p.Grade + ")" } ).ToList();
+
+			var sandwichOptions = new List<Option>
+			{
+				new Option { Value = "Little John #1: The Pepe® (Ham & Provolone)" },
+				new Option { Value = "Little John #2: Big John® (Roast Beef)" },
+				new Option { Value = "Little John #3: Totally Tuna® (Tuna Salad & Cucumber)" },
+				new Option { Value = "Little John #4: Turkey Tom® (Turkey Breast)" },
+				new Option { Value = "Little John #5: Vito® (Salami, Capocollo, Provolone, Onion, Oil & Vinegar, Oregano-Basil)" },
+				new Option { Value = "Little John #6: The Veggie (Provolone, Avocado Spread, Cucumber)" },
+				new Option { Value = "Little John B.L.T. (Bacon, Lettuce, Tomato, Mayo)" }
+			};
+
+			var chipOptions = new List<Option>
+			{
+				new Option { Value = "Regular Jimmy Chips®" },
+				new Option { Value = "BBQ Jimmy Chips®" },
+				new Option { Value = "Salt & Vinegar Jimmy Chips®" },
+				new Option { Value = "Jalapeño Jimmy Chips®" }
+			};
+
+			requests.Add( new Request
+			{
+				CreateItem = new CreateItemRequest
+				{
+					Item = new Item
+					{
+						Title = "Email Address (for order confirmation copy)",
+						QuestionItem = new QuestionItem
+						{
+							Question = new Question
+							{
+								Required = true,
+								TextQuestion = new TextQuestion { Paragraph = false }
+							}
+						}
+					},
+					Location = new Location { Index = 0 }
+				}
+			} );
+
+			requests.Add( new Request
+			{
+				CreateItem = new CreateItemRequest
+				{
+					Item = new Item
+					{
+						Title = "Player Name",
+						QuestionItem = new QuestionItem
+						{
+							Question = new Question
+							{
+								Required = true,
+								ChoiceQuestion = new ChoiceQuestion
+								{
+									Type = "DROP_DOWN",
+									Options = playerOptions
+								}
+							}
+						}
+					},
+					Location = new Location { Index = 1 }
+				}
+			} );
+
+			requests.Add( new Request
+			{
+				CreateItem = new CreateItemRequest
+				{
+					Item = new Item
+					{
+						Title = "Sandwich Choice",
+						QuestionItem = new QuestionItem
+						{
+							Question = new Question
+							{
+								Required = true,
+								ChoiceQuestion = new ChoiceQuestion
+								{
+									Type = "DROP_DOWN",
+									Options = sandwichOptions
+								}
+							}
+						}
+					},
+					Location = new Location { Index = 2 }
+				}
+			} );
+
+			requests.Add( new Request
+			{
+				CreateItem = new CreateItemRequest
+				{
+					Item = new Item
+					{
+						Title = "Chip Choice",
+						QuestionItem = new QuestionItem
+						{
+							Question = new Question
+							{
+								Required = true,
+								ChoiceQuestion = new ChoiceQuestion
+								{
+									Type = "RADIO",
+									Options = chipOptions
+								}
+							}
+						}
+					},
+					Location = new Location { Index = 3 }
+				}
+			} );
+
+			requests.Add( new Request
+			{
+				CreateItem = new CreateItemRequest
+				{
+					Item = new Item
+					{
+						Title = "Sandwich Modifiers & Special Instructions",
+						Description = "Enter removals or additions (e.g., \"No mayo,\" \"No tomato,\" \"Add mustard,\" \"No onions\").",
+						QuestionItem = new QuestionItem
+						{
+							Question = new Question
+							{
+								Required = false,
+								TextQuestion = new TextQuestion
+								{
+									Paragraph = true
+								}
+							}
+						}
+					},
+					Location = new Location { Index = 4 }
+				}
+			} );
+
+			var batchRequest = new BatchUpdateFormRequest { Requests = requests };
+			await _formsService.Forms.BatchUpdate( batchRequest, formId ).ExecuteAsync();
+
+			return await _formsService.Forms.Get( formId ).ExecuteAsync();
+		}
 	}
 }
