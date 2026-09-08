@@ -83,15 +83,35 @@
 				<h1 style="font-size: 1.75rem; margin-bottom: 0.2rem;">Oregon JV2 Boys Soccer</h1>
 				<p class="subtitle" style="font-size: 0.9rem; margin-bottom: 0;">Parent Volunteer Portal, Team Dinners & Match Schedule</p>
 			</div>
-			<div>
-				<a href="#duesSection" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; padding: 0.5rem 1rem; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); color: #60a5fa; text-decoration: none;">
-					<span>💳</span> Jump to Team Dues & Payments ↓
+			<div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+				<a href="#dinnersSection" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; padding: 0.45rem 0.85rem; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); color: #60a5fa; text-decoration: none;">
+					<span>🥗</span> Team Dinners ↓
+				</a>
+				<a href="#scheduleSection" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; padding: 0.45rem 0.85rem; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #34d399; text-decoration: none;">
+					<span>📅</span> Match Schedule ↓
+				</a>
+				<a href="#duesSection" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; padding: 0.45rem 0.85rem; background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); color: #fbbf24; text-decoration: none;">
+					<span>💳</span> Team Dues ↓
 				</a>
 			</div>
 		</header>
 
+		<!-- Team Dinners Section (First Priority) -->
+		<section id="dinnersSection" style="margin-bottom: 3.5rem;">
+			<h2 class="section-title">
+				<span>🥗</span> Team Dinner Sign-Ups & Volunteer Status
+			</h2>
+			<p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+				Post-practice dinners at Huntoon Concessions. Maximum 5 parents per dinner date. Dates fill automatically once 5 slots are reached!
+			</p>
+			
+			<div class="dinner-grid" id="dinnerGrid">
+				<!-- Dynamically rendered by app.js -->
+			</div>
+		</section>
+
 		<!-- Schedule & Event Calendar Section -->
-		<section style="margin-bottom: 3.5rem;">
+		<section id="scheduleSection" style="margin-bottom: 3.5rem;">
 			<h2 class="section-title">
 				<span>📅</span> Official Match & Event Schedule
 			</h2>
@@ -135,21 +155,7 @@
 			</div>
 		</section>
 
-		<!-- Team Dinners Section -->
-		<section style="margin-bottom: 3.5rem;">
-			<h2 class="section-title">
-				<span>🥗</span> Team Dinner Sign-Ups & Volunteer Status
-			</h2>
-			<p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-				Post-practice dinners at Huntoon Concessions. Maximum 5 parents per dinner date. Dates fill automatically once 5 slots are reached!
-			</p>
-			
-			<div class="dinner-grid" id="dinnerGrid">
-				<!-- Dynamically rendered by app.js -->
-			</div>
-		</section>
-
-		<!-- Team Dues & How to Pay Section (Moved to Bottom) -->
+		<!-- Team Dues & How to Pay Section (Bottom of Page) -->
 		<section id="duesSection" style="margin-bottom: 3.5rem;">
 			<h2 class="section-title">
 				<span>💳</span> Team Dues & Payment Information
