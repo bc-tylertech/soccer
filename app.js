@@ -515,3 +515,8 @@ function setupTabs() {
 		});
 	});
 }
+
+// Automatically poll for live updates every 3 minutes (180,000 ms) in the background
+setInterval(() => {
+	loadLiveData();
+}, 180000);
