@@ -482,11 +482,6 @@ function renderSchedule(events, filter = 'ALL') {
 
 		if (!categoryMatch) return false;
 
-		// For Service & Bonding tab, show ALL category events (so past bonding events like Gasner's dinner & Alumni game remain visible)
-		if (filter === 'SERVICE') {
-			return true;
-		}
-
 		if (e.date) {
 			const parts = e.date.split(' ');
 			const dateStr = parts[1] || e.date; // e.g. "9/1" or "8/29"
