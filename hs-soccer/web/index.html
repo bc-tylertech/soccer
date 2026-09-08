@@ -77,66 +77,21 @@
 	<div class="container" id="mainContainer" style="display: none;">
 		
 		<!-- Header Banner -->
-		<header style="padding: 1.25rem 1.5rem; margin-bottom: 1.75rem;">
-			<div class="team-badge" style="margin-bottom: 0.35rem; font-size: 0.75rem; padding: 0.25rem 0.75rem;">Oregon Panthers • 2026 Season</div>
-			<h1 style="font-size: 1.75rem; margin-bottom: 0.2rem;">Oregon JV2 Boys Soccer</h1>
-			<p class="subtitle" style="font-size: 0.9rem; margin-bottom: 0;">Parent Volunteer Portal, Team Dinners & Match Schedule</p>
+		<header style="padding: 1.25rem 1.5rem; margin-bottom: 1.75rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+			<div>
+				<div class="team-badge" style="margin-bottom: 0.35rem; font-size: 0.75rem; padding: 0.25rem 0.75rem;">Oregon Panthers • 2026 Season</div>
+				<h1 style="font-size: 1.75rem; margin-bottom: 0.2rem;">Oregon JV2 Boys Soccer</h1>
+				<p class="subtitle" style="font-size: 0.9rem; margin-bottom: 0;">Parent Volunteer Portal, Team Dinners & Match Schedule</p>
+			</div>
+			<div>
+				<a href="#duesSection" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; padding: 0.5rem 1rem; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); color: #60a5fa; text-decoration: none;">
+					<span>💳</span> Jump to Team Dues & Payments ↓
+				</a>
+			</div>
 		</header>
 
-		<!-- Team Dues & How to Pay Section -->
-		<section style="margin-bottom: 3.5rem;">
-			<h2 class="section-title">
-				<span>💳</span> Team Dues & Payment Information
-			</h2>
-			<div class="event-card" style="background: #1e293b; padding: 1.75rem; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.08);">
-				<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
-					<div>
-						<h3 style="font-size: 1.3rem; color: #f8fafc; margin-bottom: 0.25rem;">Fall Season Team Dues: <span style="color: #3b82f6;">$75.00</span> per player</h3>
-						<p style="color: #94a3b8; font-size: 0.95rem;">Payment Due Date: <strong style="color: #f8fafc;">Wednesday, September 2nd</strong></p>
-					</div>
-					<div class="status-badge status-confirmed" style="font-size: 0.9rem; padding: 0.4rem 1rem;">
-						Co-Manager: Megan Rueth
-					</div>
-				</div>
-
-				<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-top: 1rem;">
-					<div style="background: #0f172a; padding: 1.25rem; border-radius: 0.75rem; border: 1px solid rgba(59,130,246,0.2);">
-						<div style="font-size: 1.1rem; font-weight: 600; color: #60a5fa; margin-bottom: 0.5rem;">💙 Venmo (Preferred)</div>
-						<div style="font-size: 1.2rem; font-weight: 700; color: #f8fafc; letter-spacing: 0.5px;" id="venmoHandle">Loading...</div>
-						<div style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.3rem;">Phone Last 4 Digits: <strong id="venmoPhone">••••</strong></div>
-					</div>
-
-					<div style="background: #0f172a; padding: 1.25rem; border-radius: 0.75rem; border: 1px solid rgba(59,130,246,0.2);">
-						<div style="font-size: 1.1rem; font-weight: 600; color: #60a5fa; margin-bottom: 0.5rem;">💙 PayPal</div>
-						<div style="font-size: 1.2rem; font-weight: 700; color: #f8fafc; letter-spacing: 0.5px;" id="paypalHandle">Loading...</div>
-						<div style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.3rem;">Phone Last 4 Digits: <strong id="paypalPhone">••••</strong></div>
-					</div>
-				</div>
-
-				<div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.9rem; color: #cbd5e1;">
-					<p style="margin-bottom: 0.5rem;">📝 <strong>Important Memo Note:</strong> Please include your player's name in the Venmo / PayPal note or memo line of a check.</p>
-					<p style="margin-bottom: 0.5rem;">💵 <strong>Cash or Check:</strong> Personal check or cash is accepted at Tuesday's game. Please message Megan to let her know.</p>
-					<p style="color: #94a3b8; font-size: 0.85rem;">🤝 <strong>Scholarship Funds:</strong> If this fee presents a financial hardship, scholarship funds are available. Please contact Megan or Brian privately.</p>
-				</div>
-			</div>
-		</section>
-
-		<!-- Team Dinners Section -->
-		<section style="margin-bottom: 3.5rem;">
-			<h2 class="section-title">
-				<span>🥗</span> Team Dinner Sign-Ups & Volunteer Status
-			</h2>
-			<p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-				Post-practice dinners at Huntoon Concessions. Maximum 4 parents per dinner date. Dates fill automatically once 4 slots are reached!
-			</p>
-			
-			<div class="dinner-grid" id="dinnerGrid">
-				<!-- Dynamically rendered by app.js -->
-			</div>
-		</section>
-
 		<!-- Schedule & Event Calendar Section -->
-		<section>
+		<section style="margin-bottom: 3.5rem;">
 			<h2 class="section-title">
 				<span>📅</span> Official Match & Event Schedule
 			</h2>
@@ -177,6 +132,58 @@
 
 			<div class="schedule-grid" id="scheduleGrid">
 				<!-- Dynamically rendered by app.js -->
+			</div>
+		</section>
+
+		<!-- Team Dinners Section -->
+		<section style="margin-bottom: 3.5rem;">
+			<h2 class="section-title">
+				<span>🥗</span> Team Dinner Sign-Ups & Volunteer Status
+			</h2>
+			<p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+				Post-practice dinners at Huntoon Concessions. Maximum 5 parents per dinner date. Dates fill automatically once 5 slots are reached!
+			</p>
+			
+			<div class="dinner-grid" id="dinnerGrid">
+				<!-- Dynamically rendered by app.js -->
+			</div>
+		</section>
+
+		<!-- Team Dues & How to Pay Section (Moved to Bottom) -->
+		<section id="duesSection" style="margin-bottom: 3.5rem;">
+			<h2 class="section-title">
+				<span>💳</span> Team Dues & Payment Information
+			</h2>
+			<div class="event-card" style="background: #1e293b; padding: 1.75rem; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.08);">
+				<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+					<div>
+						<h3 style="font-size: 1.3rem; color: #f8fafc; margin-bottom: 0.25rem;">Fall Season Team Dues: <span style="color: #3b82f6;">$75.00</span> per player</h3>
+						<p style="color: #94a3b8; font-size: 0.95rem;">Payment Due Date: <strong style="color: #f8fafc;">Wednesday, September 2nd</strong></p>
+					</div>
+					<div class="status-badge status-confirmed" style="font-size: 0.9rem; padding: 0.4rem 1rem;">
+						Co-Manager: Megan Rueth
+					</div>
+				</div>
+
+				<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-top: 1rem;">
+					<div style="background: #0f172a; padding: 1.25rem; border-radius: 0.75rem; border: 1px solid rgba(59,130,246,0.2);">
+						<div style="font-size: 1.1rem; font-weight: 600; color: #60a5fa; margin-bottom: 0.5rem;">💙 Venmo (Preferred)</div>
+						<div style="font-size: 1.2rem; font-weight: 700; color: #f8fafc; letter-spacing: 0.5px;" id="venmoHandle">Loading...</div>
+						<div style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.3rem;">Phone Last 4 Digits: <strong id="venmoPhone">••••</strong></div>
+					</div>
+
+					<div style="background: #0f172a; padding: 1.25rem; border-radius: 0.75rem; border: 1px solid rgba(59,130,246,0.2);">
+						<div style="font-size: 1.1rem; font-weight: 600; color: #60a5fa; margin-bottom: 0.5rem;">💙 PayPal</div>
+						<div style="font-size: 1.2rem; font-weight: 700; color: #f8fafc; letter-spacing: 0.5px;" id="paypalHandle">Loading...</div>
+						<div style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.3rem;">Phone Last 4 Digits: <strong id="paypalPhone">••••</strong></div>
+					</div>
+				</div>
+
+				<div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.9rem; color: #cbd5e1;">
+					<p style="margin-bottom: 0.5rem;">📝 <strong>Important Memo Note:</strong> Please include your player's name in the Venmo / PayPal note or memo line of a check.</p>
+					<p style="margin-bottom: 0.5rem;">💵 <strong>Cash or Check:</strong> Personal check or cash is accepted at Tuesday's game. Please message Megan to let her know.</p>
+					<p style="color: #94a3b8; font-size: 0.85rem;">🤝 <strong>Scholarship Funds:</strong> If this fee presents a financial hardship, scholarship funds are available. Please contact Megan or Brian privately.</p>
+				</div>
 			</div>
 		</section>
 
