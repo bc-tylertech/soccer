@@ -659,7 +659,7 @@ namespace HsSoccer.Services
 			{
 				var row = new List<object>
 				{
-					"=IFERROR(SUMPRODUCT(('Form Responses 3'!D$2:D) * ISNUMBER(SEARCH(A" + r + ", 'Form Responses 3'!C$2:C)) * ISNUMBER(SEARCH(B" + r + ", 'Form Responses 3'!C$2:C))), 0)",
+					"=IFERROR(SUMIF('Form Responses 3'!C:C, C" + r + ", 'Form Responses 3'!D:D), 0)",
 					"=G" + r + "-H" + r,
 					"=IF(H" + r + ">=G" + r + ", \"PAID\", \"UNPAID\")"
 				};
