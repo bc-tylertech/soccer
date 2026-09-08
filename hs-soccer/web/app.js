@@ -56,19 +56,6 @@ const fallbackDinners = [
 		drinks: "Unassigned",
 		dessert: "Unassigned",
 		sides: "Unassigned"
-	},
-	{
-		date: "Monday, October 12th",
-		location: "Huntoon Concessions",
-		count: 0,
-		max: 4,
-		status: "Needs Volunteers (4 Needed)",
-		statusClass: "status-needs",
-		fillClass: "fill-needs",
-		main: "Unassigned",
-		drinks: "Unassigned",
-		dessert: "Unassigned",
-		sides: "Unassigned"
 	}
 ];
 
@@ -102,7 +89,7 @@ const scheduleData = [
 	{ date: "Tue 10/06", time: "5:00 PM", category: "Game", title: "vs Madison West", location: "OHS Huntoon Field", tagClass: "tag-game" },
 	{ date: "Thu 10/08", time: "5:00 PM", category: "Game", title: "vs Edgewood", location: "Jaycee Community Park Field 1", tagClass: "tag-game" },
 	{ date: "Sat 10/10", time: "11:00 AM", category: "Game", title: "@ Sun Prairie West", location: "Sun Prairie West High School", tagClass: "tag-game" },
-	{ date: "Mon 10/12", time: "Post-Practice", category: "Dinner", title: "Team Dinner #6", location: "Huntoon Concessions", tagClass: "tag-dinner" },
+	{ date: "Mon 10/12", time: "Post-Practice", category: "Dinner", title: "Team Dinner #6 (Coach Gasner Pizza Party)", location: "Huntoon Concessions", tagClass: "tag-dinner" },
 	{ date: "Tue 10/13", time: "4:30 PM", category: "Game", title: "vs Sauk Prairie (Season Finale)", location: "Jaycee Community Park Field 1", tagClass: "tag-game" },
 	{ date: "Thu 10/15", time: "6:00 PM", category: "Banquet", title: "End of Season Team Banquet", location: "OHS Cafeteria", tagClass: "tag-bonding" }
 ];
@@ -343,7 +330,7 @@ function parseCSVToDinners(csvText) {
 		const cols = parseCSVLine(lines[i]);
 		if (cols.length >= 7) {
 			const dateStr = cols[0];
-			if (!isActualDinnerDate(dateStr) || isDinnerDatePast(dateStr)) continue;
+			if (!isActualDinnerDate(dateStr) || isDinnerDatePast(dateStr) || dateStr.includes('10/12') || dateStr.includes('October 12')) continue;
 
 			const formattedDate = formatDinnerDate(dateStr);
 			const host = cols[1] || 'Huntoon Concessions';
@@ -404,7 +391,7 @@ function renderDinnerCards(dinners) {
 	const grid = document.getElementById('dinnerGrid');
 	if (!grid) return;
 
-	grid.innerHTML = dinners.map(d => {
+	const parentCards = dinners.map(d => {
 		const percent = Math.min(100, Math.round((d.count / d.max) * 100));
 		return `
 			<div class="dinner-card">
@@ -458,6 +445,26 @@ function renderDinnerCards(dinners) {
 			</div>
 		`;
 	}).join('');
+
+	const pizzaCard = `
+		<div class="dinner-card" style="border: 1px solid rgba(245,158,11,0.4); background: linear-gradient(135deg, rgba(30,41,59,0.9) 0%, rgba(245,158,11,0.08) 100%);">
+			<div>
+				<div class="dinner-header">
+					<div>
+						<div class="dinner-date">Monday, October 12th</div>
+						<div class="dinner-location">📍 Huntoon Concessions (Post-Practice)</div>
+					</div>
+					<span class="status-badge status-confirmed" style="background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4);">🍕 Pizza Party</span>
+				</div>
+				<div style="margin-top: 1rem; padding: 1rem; background: #0f172a; border-radius: 0.75rem; border: 1px solid rgba(245,158,11,0.2);">
+					<div style="font-size: 1rem; font-weight: 600; color: #fbbf24; margin-bottom: 0.35rem;">🍕 Hosted by Coach Gasner</div>
+					<div style="font-size: 0.9rem; color: #cbd5e1; line-height: 1.5;">Coach Gasner is providing pizza for the team at Huntoon Concessions post-practice! No parent food sign-ups are needed for this date.</div>
+				</div>
+			</div>
+		</div>
+	`;
+
+	grid.innerHTML = parentCards + pizzaCard;
 }
 
 function renderSchedule(events, filter = 'ALL') {
