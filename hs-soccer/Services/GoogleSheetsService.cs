@@ -377,6 +377,7 @@ namespace HsSoccer.Services
 					new List<object> { "🥗 Team Dinner Sign-Up Form", "https://docs.google.com/forms/d/1Ol68WmioL42GO_n47N6Cq3g30o_meeqYk9Hjn2SqPD8/viewform", "All Parents", "Form for parents to sign up for dinner dates (Min 3 / Max 5 per date)" },
 					new List<object> { "💳 Expense Reimbursement Form", "https://docs.google.com/forms/d/1a38G6PpgwZrqMzIUNCVxXQwvLsdP-va-jLdnUzxE91o/viewform", "Co-Managers & Volunteers", "Form to submit Gatorade, gift card & sub receipts" },
 					new List<object> { "💵 $75 Dues Collection Form", "https://docs.google.com/forms/d/1RnY-KJ-r29IKLJN_rtXYahsWdu6TNepmpINRRY4No18/viewform", "Co-Managers Only", "Form for Brian & Megan to record $75 fee receipts" },
+					new List<object> { "🥖 Waunakee Sub Order Form", "https://docs.google.com/forms/d/e/1FAIpQLSff3YlsgHNNnogvLVEk-abaXajU_M0FyjE9GGTJ2tyfhXhD7Q/viewform", "All Players & Parents", "Form for ordering Jimmy John's subs & chips for Waunakee Tournament" },
 					new List<object> { "🌐 Public Parent Web Portal", "https://bc-tylertech.github.io/soccer/", "All Parents", "Live dark-mode website showing dinner status & game schedule" },
 					new List<object> { "📅 Official GoBound Match Schedule", "https://www.gobound.com/wi/wiaa/bsc/2026-27/oregon/jv2/schedule", "Public", "Official High School Athletic Association Match Schedule" },
 					new List<object> { "" },
@@ -444,7 +445,7 @@ namespace HsSoccer.Services
 					player.PlayerEmail,
 					parentEmails,
 					player.DuesRequired,
-					"=IFERROR(SUMIF('Dues Responses'!C:C, \"*\" & B" + rIndex + " & \"*\", 'Dues Responses'!D:D), 0) + IFERROR(SUMIF('Dues Responses'!C:C, \"*\" & B" + rIndex + " & \"*\", 'Dues Responses'!I:I), 0) + IFERROR(SUMIF('Dues Responses'!H:H, \"*\" & B" + rIndex + " & \"*\", 'Dues Responses'!I:I), 0)",
+					"=IFERROR(SUMIF('Dues Responses'!C:C, \"*\" & B" + rIndex + " & \", \" & C" + rIndex + " & \"*\", 'Dues Responses'!D:D), 0)",
 					"=G" + rIndex + "-H" + rIndex,
 					"=IF(I" + rIndex + "<=0,\"Paid\",IF(H" + rIndex + ">0,\"Partial\",\"Unpaid\"))"
 				};
@@ -604,7 +605,7 @@ namespace HsSoccer.Services
 
 			valueRange.Values.Add( new List<object> { "--- 💵 CO-MANAGER REIMBURSEMENT CASH POOL SUMMARY ---" } );
 			valueRange.Values.Add( new List<object> { "Total Dues Collected (Roster):", "=IFERROR(SUM(Roster!H2:H), 0)" } );
-			valueRange.Values.Add( new List<object> { "Total Reimbursements Paid Out:", "=IFERROR(SUMIF(I8:I100, \"Paid\", E8:E100), 0)" } );
+			valueRange.Values.Add( new List<object> { "Total Expenses Submitted:", "=IFERROR(SUM(E8:E100), 0)" } );
 			valueRange.Values.Add( new List<object> { "Current Available Cash Balance:", "=B2-B3", "", "=IF(B4<0, \"🚨 CRITICAL DEFICIT\", IF(B4<100, \"⚠️ LOW FUNDS\", \"🟢 HEALTHY BALANCE\"))" } );
 			valueRange.Values.Add( new List<object> { "" } );
 			valueRange.Values.Add( new List<object> { "--- 📋 SUBMITTED EXPENSE REIMBURSEMENT CLAIMS ---" } );
@@ -659,9 +660,9 @@ namespace HsSoccer.Services
 			{
 				var row = new List<object>
 				{
-					"=IFERROR(SUMIF('Form Responses 3'!C:C, C" + r + ", 'Form Responses 3'!D:D), 0)",
+					"=IFERROR(SUMIF('Dues Responses'!C:C, \"*\" & B" + r + " & \", \" & C" + r + " & \"*\", 'Dues Responses'!D:D), 0)",
 					"=G" + r + "-H" + r,
-					"=IF(H" + r + ">=G" + r + ", \"PAID\", \"UNPAID\")"
+					"=IF(I" + r + "<=0, \"Paid\", IF(H" + r + ">0, \"Partial\", \"Unpaid\"))"
 				};
 				valueRange.Values.Add( row );
 			}
@@ -676,6 +677,43 @@ namespace HsSoccer.Services
 			catch ( Exception ex )
 			{
 				Console.WriteLine( "Note updating Roster formulas: " + ex.Message );
+			}
+		}
+
+		public async Task DebugNoahAsync( string spreadsheetId )
+		{
+			if ( _service == null )
+			{
+				await InitializeAsync();
+			}
+
+			Console.WriteLine( "=== DEBUG SPREADSHEET TABS & DUES RESPONSES ===" );
+			var meta = await _service.Spreadsheets.Get( spreadsheetId ).ExecuteAsync();
+			foreach ( var s in meta.Sheets )
+			{
+				Console.WriteLine( "TAB: '" + s.Properties.Title + "'" );
+			}
+
+			var duesGet = await _service.Spreadsheets.Values.Get( spreadsheetId, "'Dues Responses'!A1:F50" ).ExecuteAsync();
+			if ( duesGet.Values != null )
+			{
+				Console.WriteLine( "--- DUES RESPONSES TAB ---" );
+				foreach ( var row in duesGet.Values )
+				{
+					var rowStr = string.Join( " | ", row.Select( c => c?.ToString() ?? "" ) );
+					Console.WriteLine( "DUES ROW: " + rowStr );
+				}
+			}
+
+			var rosterGet = await _service.Spreadsheets.Values.Get( spreadsheetId, "Roster!A1:J30" ).ExecuteAsync();
+			if ( rosterGet.Values != null )
+			{
+				Console.WriteLine( "--- ROSTER TAB ---" );
+				foreach ( var row in rosterGet.Values )
+				{
+					var rowStr = string.Join( " | ", row.Select( c => c?.ToString() ?? "" ) );
+					Console.WriteLine( "ROSTER ROW: " + rowStr );
+				}
 			}
 		}
 
@@ -697,7 +735,7 @@ namespace HsSoccer.Services
 					},
 					new List<object>
 					{
-						"=IFERROR(FILTER('Form Responses 3'!A2:F, 'Form Responses 3'!A2:A<>\"), \"No form submissions yet\")"
+						"=IFERROR(FILTER('Dues Responses'!A2:F, 'Dues Responses'!A2:A<>\"), \"No form submissions yet\")"
 					}
 				}
 			};
@@ -957,6 +995,56 @@ namespace HsSoccer.Services
 					Console.WriteLine( "Warning setting IMPORTRANGE on public sheet: " + ex.Message );
 				}
 			}
+		}
+
+		public async Task SetupSubOrderResponsesTabAsync( string spreadsheetId )
+		{
+			if ( _service == null )
+			{
+				await InitializeAsync();
+			}
+
+			var spreadsheet = await _service.Spreadsheets.Get( spreadsheetId ).ExecuteAsync();
+			var targetSheet = spreadsheet.Sheets.FirstOrDefault( s => s.Properties.Title.Equals( "Sub Order Responses", StringComparison.OrdinalIgnoreCase ) );
+
+			if ( targetSheet == null )
+			{
+				var addSheetReq = new BatchUpdateSpreadsheetRequest
+				{
+					Requests = new List<Request>
+					{
+						new Request
+						{
+							AddSheet = new AddSheetRequest
+							{
+								Properties = new SheetProperties
+								{
+									Title = "Sub Order Responses"
+								}
+							}
+						}
+					}
+				};
+				await _service.Spreadsheets.BatchUpdate( addSheetReq, spreadsheetId ).ExecuteAsync();
+				Console.WriteLine( "Created 'Sub Order Responses' tab on Master Sheet." );
+			}
+
+			var range = "'Sub Order Responses'!A1:F1";
+			var valueRange = new ValueRange
+			{
+				Values = new List<IList<object>>
+				{
+					new List<object>
+					{
+						"Timestamp", "Email Address", "Player Name", "Sandwich Choice", "Chip Choice", "Sandwich Modifiers & Special Instructions"
+					}
+				}
+			};
+
+			var updateRequest = _service.Spreadsheets.Values.Update( valueRange, spreadsheetId, range );
+			updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+			await updateRequest.ExecuteAsync();
+			Console.WriteLine( "SUCCESS: Configured 'Sub Order Responses' tab headers on Master Sheet." );
 		}
 	}
 }
