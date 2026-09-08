@@ -500,6 +500,10 @@ function renderSchedule(events, filter = 'ALL') {
 			<div class="event-title">${e.title}</div>
 			<div class="event-meta">📅 ${e.date} @ ${e.time}</div>
 			<div class="event-meta">📍 ${e.location}</div>
+			${(e.title && e.title.toLowerCase().includes('waunakee')) || (e.category && e.category.toLowerCase().includes('tournament')) 
+				? `<div style="margin-top: 1rem;"><a href="https://docs.google.com/forms/d/e/1FAIpQLSff3YlsgHNNnogvLVEk-abaXajU_M0FyjE9GGTJ2tyfhXhD7Q/viewform" target="_blank" class="btn btn-primary" style="width:100%; justify-content:center;">🥖 Order Subs & Chips</a></div>`
+				: ''
+			}
 		</div>
 	`).join('');
 }
